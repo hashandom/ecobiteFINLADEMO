@@ -35,6 +35,10 @@ public class SecurityConfig {
                         // Public endpoints
                         .requestMatchers("/auth/login").permitAll()
 
+                        .requestMatchers("/auth/forgot-password").permitAll()
+
+                        .requestMatchers("/auth/reset-password").permitAll()
+
                         // Only ADMIN and MANAGER can register users
                         .requestMatchers("/auth/register")
                         .hasAnyRole("ADMIN","MANAGER")

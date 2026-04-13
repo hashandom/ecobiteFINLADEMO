@@ -1,0 +1,160 @@
+version: "3.8"
+
+services:
+
+  auth-mysql:
+    image: mysql:8
+    container_name: auth-mysql
+    restart: always
+    ports:
+      - "3307:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: auth_db
+    volumes:
+      - auth_mysql_data:/var/lib/mysql
+
+  product-mysql:
+    image: mysql:8
+    container_name: product-mysql
+    restart: always
+    ports:
+      - "3308:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: product_db
+    volumes:
+      - product_mysql_data:/var/lib/mysql
+
+  batch-mysql:
+    image: mysql:8
+    container_name: batch-mysql
+    restart: always
+    ports:
+      - "3309:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: batch_db
+    volumes:
+      - batch_mysql_data:/var/lib/mysql
+
+  supplier-mysql:
+    image: mysql:8
+    container_name: supplier-mysql
+    restart: always
+    ports:
+      - "3310:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: supplier_db
+    volumes:
+      - supplier_mysql_data:/var/lib/mysql
+
+  reorder-mysql:
+    image: mysql:8
+    container_name: reorder-mysql
+    restart: always
+    ports:
+      - "3311:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: reorder_db
+    volumes:
+      - reorder_mysql_data:/var/lib/mysql
+
+  qr-mysql:
+    image: mysql:8
+    container_name: qr-mysql
+    restart: always
+    ports:
+      - "3312:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: qr_db
+    volumes:
+      - qr_mysql_data:/var/lib/mysql
+
+  spoilage-mysql:
+    image: mysql:8
+    container_name: spoilage-mysql
+    restart: always
+    ports:
+      - "3313:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: spoilage_db
+    volumes:
+      - spoilage_mysql_data:/var/lib/mysql
+
+  location-mysql:
+    image: mysql:8
+    container_name: location-mysql
+    restart: always
+    ports:
+      - "3314:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: location_db
+    volumes:
+      - location_mysql_data:/var/lib/mysql
+
+  recall-mysql:
+    image: mysql:8
+    container_name: recall-mysql
+    restart: always
+    ports:
+      - "3315:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: recall_db
+    volumes:
+      - recall_mysql_data:/var/lib/mysql
+
+  notification-mysql:
+    image: mysql:8
+    container_name: notification-mysql
+    restart: always
+    ports:
+      - "3316:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: notification_db
+    volumes:
+      - notification_mysql_data:/var/lib/mysql
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.5.0
+    container_name: zookeeper
+    restart: always
+    ports:
+      - "2181:2181"
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    container_name: kafka
+    restart: always
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+
+volumes:
+  auth_mysql_data:
+  product_mysql_data:
+  batch_mysql_data:
+  supplier_mysql_data:
+  reorder_mysql_data:
+  qr_mysql_data:
+  spoilage_mysql_data:
+  location_mysql_data:
+  recall_mysql_data:
+  notification_mysql_data:

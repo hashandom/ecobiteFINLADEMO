@@ -1,8 +1,6 @@
 package com.ecobite.auth_service.controller;
 
-import com.ecobite.auth_service.dto.request.ChangePasswordRequest;
-import com.ecobite.auth_service.dto.request.LoginRequest;
-import com.ecobite.auth_service.dto.request.RegisterRequest;
+import com.ecobite.auth_service.dto.request.*;
 import com.ecobite.auth_service.dto.response.ApiResponse;
 import com.ecobite.auth_service.dto.response.AuthResponse;
 import com.ecobite.auth_service.service.AuthService;
@@ -37,5 +35,41 @@ public class AuthController {
         return new ApiResponse(true,
                 service.changePassword(request),
                 null);
+    }
+
+    @PutMapping("/unlock/{username}")
+    public ApiResponse unlockAccount(@PathVariable String username){
+        service.unlockAccount(username);
+        return new ApiResponse(true,"Account unlocked",null);
+    }
+
+    @PostMapping("/forgot-password")
+    public ApiResponse forgotPassword(@RequestBody ForgotPasswordRequest request){
+        return new ApiResponse(
+                true,
+                service.forgotPassword(request),
+                null
+        );
+    }
+
+    @PostMapping("/reset-password")
+    public ApiResponse resetPassword(@RequestBody ResetPasswordRequest request){
+        return new ApiResponse(
+                true,
+                service.resetPassword(request),
+                null
+        );
+    }
+
+    @PostMapping("/logout")
+    public ApiResponse logout(@RequestHeader("Authorization") String token){
+
+        service.logout(token);
+
+        return new ApiResponse(
+                true,
+                "Logout successful",
+                null
+        );
     }
 }

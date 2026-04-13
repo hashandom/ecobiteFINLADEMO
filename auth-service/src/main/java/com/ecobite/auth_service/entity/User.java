@@ -4,6 +4,8 @@ import com.ecobite.auth_service.enums.Role;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Getter
 @Setter
@@ -27,5 +29,11 @@ public class User {
     private String status;
 
     private boolean locked;
+
+    private int failedAttempts;
+
+    private String resetToken;
+
+    private LocalDateTime tokenExpiry;
 
 }

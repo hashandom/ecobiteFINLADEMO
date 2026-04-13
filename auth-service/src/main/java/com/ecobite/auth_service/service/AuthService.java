@@ -11,10 +11,15 @@ public interface AuthService {
 
     String changePassword(ChangePasswordRequest request);
 
-   // Object refreshToken(RefreshTokenRequest request);
+    String unlockAccount(String username);
 
-   // String logout(String username);
+    String forgotPassword(ForgotPasswordRequest request);
 
-   // String forgotPassword(ForgotPasswordRequest request);
+    String resetPassword(ResetPasswordRequest request);
+
+    String logout(String token);
+
+    // String logout(String username);
+
 
 }

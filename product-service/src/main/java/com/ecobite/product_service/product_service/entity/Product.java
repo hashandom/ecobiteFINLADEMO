@@ -1,59 +1,77 @@
 package com.ecobite.product_service.product_service.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@Table(name="products")
 @Entity
 public class Product {
+    @Id
+    private String id;
 
-        @Id
-        @GeneratedValue(strategy = GenerationType.IDENTITY)
-        private Long id;
+    public void setId(String id) {
+        this.id = id;
+    }
 
-        private String name;
+    public void setName(String name) {
+        this.name = name;
+    }
 
-        private String category;
+    public void setCategory(String category) {
+        this.category = category;
+    }
 
-        private int stock;
+    public void setStock(int stock) {
+        this.stock = stock;
+    }
 
-        private int reorderLevel;
+    public void setReorderLevel(int reorderLevel) {
+        this.reorderLevel = reorderLevel;
+    }
 
-        public Long getId() {
-            return id;
-        }
+    public String getName() {
+        return name;
+    }
 
-        public String getName() {
-            return name;
-        }
+    public String getId() {
+        return id;
+    }
 
-        public String getCategory() {
-            return category;
-        }
+    public String getCategory() {
+        return category;
+    }
 
-        public int getStock() {
-            return stock;
-        }
+    public int getStock() {
+        return stock;
+    }
 
-        public int getReorderLevel() {
-            return reorderLevel;
-        }
+    public int getReorderLevel() {
+        return reorderLevel;
+    }
 
-        public void setName(String name) {
-            this.name = name;
-        }
+    @Column(nullable=false)
+    private String name;
 
-        public void setCategory(String category) {
-            this.category = category;
-        }
+    private String category;
 
-        public void setStock(int stock) {
-            this.stock = stock;
-        }
+    private int stock;
 
-        public void setReorderLevel(int reorderLevel) {
-            this.reorderLevel = reorderLevel;
-        }
+    private int reorderLevel;
+
+    public double getUnitPrice() {
+        return unitPrice;
+    }
+
+    public void setUnitPrice(double unitPrice) {
+        this.unitPrice = unitPrice;
+    }
+
+    private double unitPrice;
+
     }
 

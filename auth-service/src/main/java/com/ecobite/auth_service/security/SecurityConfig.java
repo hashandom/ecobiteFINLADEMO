@@ -34,32 +34,36 @@ public class SecurityConfig {
 
                         // Public endpoints
                         .requestMatchers("/auth/login").permitAll()
-
                         .requestMatchers("/auth/forgot-password").permitAll()
-
                         .requestMatchers("/auth/reset-password").permitAll()
 
-                        // Only ADMIN and MANAGER can register users
-                        .requestMatchers("/auth/register")
-                        .hasAnyRole("ADMIN","MANAGER")
+//                        // REGISTER
+//                        .requestMatchers(HttpMethod.POST,"/auth/register")
+//                        .hasAnyRole("ADMIN","MANAGER")
+//
+//                        // CHANGE PASSWORD (allow all roles)
+//                        .requestMatchers(HttpMethod.PUT,"/auth/change-password")
+//                        .hasAnyRole("ADMIN","MANAGER","STAFF")
+//
+//                        // UNLOCK
+//                        .requestMatchers("/auth/unlock")
+//                        .hasAnyRole("ADMIN","MANAGER")
+//
+//                        // ADMIN operations
+//                        .requestMatchers(HttpMethod.DELETE,"/**")
+//                        .hasRole("ADMIN")
+//
+//                        .requestMatchers(HttpMethod.POST,"/**")
+//                        .hasRole("ADMIN")
+//
+//                        // MANAGER update
+//                        .requestMatchers(HttpMethod.PUT,"/**")
+//                        .hasAnyRole("ADMIN","MANAGER")
+//
+//                        // READ access
+//                        .requestMatchers(HttpMethod.GET,"/**")
+//                        .hasAnyRole("ADMIN","MANAGER","STAFF")
 
-                        // STAFF → VIEW ONLY
-                        .requestMatchers(HttpMethod.GET, "/**")
-                        .hasAnyRole("STAFF","MANAGER","ADMIN")
-
-                        // MANAGER → UPDATE
-                        .requestMatchers(HttpMethod.PUT, "/**")
-                        .hasAnyRole("MANAGER","ADMIN")
-
-                        // ADMIN → CREATE
-                        .requestMatchers(HttpMethod.POST, "/**")
-                        .hasRole("ADMIN")
-
-                        // ADMIN → DELETE
-                        .requestMatchers(HttpMethod.DELETE, "/**")
-                        .hasRole("ADMIN")
-
-                        // All other requests must be authenticated
                         .anyRequest().authenticated()
                 )
 

@@ -1,12 +1,21 @@
 package com.ecobite.auth_service.security;
 
-import jakarta.servlet.*;
+import jakarta.servlet.Filter;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.List;
 
 @Component
 public class JWTValidationFilter implements Filter {
@@ -20,10 +29,10 @@ public class JWTValidationFilter implements Filter {
                          FilterChain chain)
             throws IOException, ServletException {
 
-        HttpServletRequest http = (HttpServletRequest) request;
-        HttpServletResponse res = (HttpServletResponse) response;
+        HttpServletRequest httpRequest = (HttpServletRequest) request;
+        HttpServletResponse httpResponse = (HttpServletResponse) response;
 
-        String header = http.getHeader("Authorization");
+        String header = httpRequest.getHeader("Authorization");
 
         if (header != null && header.startsWith("Bearer ")) {
 
@@ -32,16 +41,26 @@ public class JWTValidationFilter implements Filter {
             try {
 
                 if (!jwtService.validateToken(token)) {
-                    res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                    res.getWriter().write("Invalid or Expired Token");
+                    httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    httpResponse.getWriter().write("Invalid or Expired Token");
                     return;
                 }
 
                 String username = jwtService.extractUsername(token);
+                String role = jwtService.extractRole(token);
+
+                UsernamePasswordAuthenticationToken authentication =
+                        new UsernamePasswordAuthenticationToken(
+                                username,
+                                null,
+                                List.of(new SimpleGrantedAuthority("ROLE_" + role))
+                        );
+
+                SecurityContextHolder.getContext().setAuthentication(authentication);
 
             } catch (Exception e) {
-                res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                res.getWriter().write("Invalid Token");
+                httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                httpResponse.getWriter().write("Invalid Token");
                 return;
             }
         }

@@ -5,6 +5,7 @@ import com.ecobite.auth_service.dto.response.ApiResponse;
 import com.ecobite.auth_service.dto.response.AuthResponse;
 import com.ecobite.auth_service.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -14,6 +15,7 @@ public class AuthController {
     @Autowired
     private AuthService service;
 
+    @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")
     @PostMapping("/register")
     public ApiResponse register(@RequestBody RegisterRequest request){
         return new ApiResponse(true,
@@ -29,7 +31,7 @@ public class AuthController {
                 service.login(request));
     }
 
-
+    @PreAuthorize("hasAnyRole('ADMIN','MANAGER','STAFF')")
     @PutMapping("/change-password")
     public ApiResponse changePassword(@RequestBody ChangePasswordRequest request){
         return new ApiResponse(true,

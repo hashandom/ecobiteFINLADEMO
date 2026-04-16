@@ -4,13 +4,13 @@ import java.time.LocalDate;
 
 public class BatchResponseDTO {
     private Long id;
-    private Long productId;
+    private String productId;
     private int quantity;
     private LocalDate expiryDate;
 
     public BatchResponseDTO() {}
 
-    public BatchResponseDTO(Long id, Long productId, int quantity, LocalDate expiryDate) {
+    public BatchResponseDTO(Long id, String productId, int quantity, LocalDate expiryDate) {
         this.id = id;
         this.productId = productId;
         this.quantity = quantity;
@@ -21,7 +21,7 @@ public class BatchResponseDTO {
         return id;
     }
 
-    public Long getProductId() {
+    public String getProductId() {
         return productId;
     }
 
@@ -37,7 +37,7 @@ public class BatchResponseDTO {
         this.id = id;
     }
 
-    public void setProductId(Long productId) {
+    public void setProductId(String productId) {
         this.productId = productId;
     }
 

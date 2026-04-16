@@ -1,21 +1,15 @@
-package com.ecobite.batch_service.entity;
+package com.ecobite.batch_service.dto.response;
 
-import jakarta.persistence.*;
-import lombok.*;
+import lombok.Builder;
+import lombok.Data;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-@Entity
-@Table(name = "batches")
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
+@Data
 @Builder
-public class Batch {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class BatchResponse {
+
     private Long id;
 
     private String batchNumber;
@@ -35,5 +29,4 @@ public class Batch {
     private BigDecimal purchasePrice;
 
     private String status;
-
 }

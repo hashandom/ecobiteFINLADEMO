@@ -7,7 +7,14 @@ import java.time.LocalDate;
 import java.util.List;
 
 public interface BatchRepository extends JpaRepository<Batch, Long> {
-    List<Batch> findByExpiryDateBefore(LocalDate date);
+    List<Batch> findByProductId(String productId);
 
-    List<Batch> findAllByOrderByExpiryDateAsc();
+    List<Batch> findByProductIdAndRemainingQuantityGreaterThanOrderByExpiryDateAsc(String productId, int qty);
+
+    List<Batch> findByExpiryDateBetween(LocalDate start, LocalDate end);
+
+    List<Batch> findByExpiryDateBeforeAndStatus(
+            LocalDate date,
+            String status
+    );
 }

@@ -20,14 +20,21 @@ public class ProductServiceImpl implements ProductService {
 
     private String generateProductId() {
 
-        long count = repository.count() + 1;
+        String lastId = repository.findLastProductId();
 
-        return String.format("PRODUCT%03d", count);
+        if (lastId == null) {
+            return "PRODUCT001";
+        }
+
+        int number = Integer.parseInt(lastId.substring(7));
+        number++;
+
+        return String.format("PRODUCT%03d", number);
     }
 
     private ProductResponse mapToResponse(Product product) {
         return ProductResponse.builder()
-                .id(generateProductId())
+                .id(product.getId())
                 .name(product.getName())
                 .category(product.getCategory())
                 .stock(product.getStock())

@@ -2,15 +2,28 @@ package com.ecobite.batch_service.service;
 
 import com.ecobite.batch_service.dto.BatchRequestDTO;
 import com.ecobite.batch_service.dto.BatchResponseDTO;
+import com.ecobite.batch_service.dto.request.CreateBatchRequest;
+import com.ecobite.batch_service.dto.request.ReduceStockRequest;
+import com.ecobite.batch_service.dto.response.BatchResponse;
 
 import java.util.List;
 
 public interface BatchService {
 
-    BatchResponseDTO createBatch(BatchRequestDTO request);
+    BatchResponse createBatch(CreateBatchRequest request);
 
-    List<BatchResponseDTO> getExpiringSoon();
+    BatchResponse getBatchById(Long id);
 
-    List<BatchResponseDTO> getFefoBatches();
+    List<BatchResponse> getBatchesByProduct(String productId);
+
+    BatchResponse reduceStock(Long id, ReduceStockRequest request);
+
+    List<BatchResponse> getExpiringSoon(int days);
+
+    List<BatchResponse> getAvailableBatches(String productId);
+
+    BatchResponse spoilBatch(Long id);
+
+    BatchResponse recallBatch(Long id);
 
 }

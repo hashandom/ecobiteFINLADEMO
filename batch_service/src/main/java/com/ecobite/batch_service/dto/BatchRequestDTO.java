@@ -3,11 +3,11 @@ package com.ecobite.batch_service.dto;
 import java.time.LocalDate;
 
 public class BatchRequestDTO {
-    private Long productId;
+    private String productId;
     private int quantity;
     private LocalDate expiryDate;
 
-    public Long getProductId() {
+    public String getProductId() {
         return productId;
     }
 
@@ -19,7 +19,7 @@ public class BatchRequestDTO {
         return expiryDate;
     }
 
-    public void setProductId(Long productId) {
+    public void setProductId(String productId) {
         this.productId = productId;
     }
 

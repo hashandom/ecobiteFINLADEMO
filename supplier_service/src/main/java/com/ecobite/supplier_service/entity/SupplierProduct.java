@@ -12,14 +12,11 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Supplier {
+public class SupplierProduct {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String name;
-    private String contactEmail;
-    private String phone;
-
-    private Double rating;
+    private Long supplierId;
+    private String productId;
 }

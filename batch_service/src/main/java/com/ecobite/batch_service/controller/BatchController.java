@@ -23,6 +23,14 @@ import java.util.List;
 public class BatchController {
     private final BatchServiceImpl service;
 
+    @GetMapping("/expiring-soon")
+    public ResponseEntity<List<BatchResponse>> getExpiringSoon(
+            @RequestParam int days) {
+
+        return ResponseEntity.ok(service.getExpiringSoon(days));
+    }
+
+
     @PostMapping("/allocate")
     public ResponseEntity<List<BatchAllocationResponse>> allocate(
             @RequestBody AllocateBatchRequest request){

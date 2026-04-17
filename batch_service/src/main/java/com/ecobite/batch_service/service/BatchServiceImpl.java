@@ -79,10 +79,36 @@ public class BatchServiceImpl implements BatchService{
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Batch not found"));
 
+        //  Status-based validation (clear messages)
+        switch (batch.getStatus()) {
+
+            case "SPOILED":
+                throw new RuntimeException("Cannot sell spoiled batch");
+
+            case "RECALLED":
+                throw new RuntimeException("Cannot sell recalled batch");
+
+            case "EXPIRED":
+                throw new RuntimeException("Batch is expired");
+
+            case "ACTIVE":
+                // continue
+                break;
+
+            default:
+                throw new RuntimeException("Invalid batch status");
+        }
+
+        //  Stock validation
+        if (batch.getRemainingQuantity() <= 0) {
+            throw new RuntimeException("No stock available in this batch");
+        }
+
         if (batch.getRemainingQuantity() < request.getSoldQuantity()) {
             throw new RuntimeException("Not enough stock available");
         }
 
+        // Reduce stock
         batch.setRemainingQuantity(
                 batch.getRemainingQuantity() - request.getSoldQuantity()
         );

@@ -10,6 +10,7 @@ import java.util.Map;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<Map<String, String>> handleNotFound(
             ResourceNotFoundException ex) {
@@ -20,8 +21,22 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
     }
 
+
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<Map<String, String>> handleRuntime(
+            RuntimeException ex) {
+
+        Map<String, String> error = new HashMap<>();
+        error.put("error", ex.getMessage());
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+    }
+
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, String>> handleGeneral(Exception ex) {
+
+        ex.printStackTrace(); // 🔥 IMPORTANT for debugging
 
         Map<String, String> error = new HashMap<>();
         error.put("error", "Internal server error");

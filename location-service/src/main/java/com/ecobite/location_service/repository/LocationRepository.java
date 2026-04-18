@@ -7,5 +7,5 @@ import java.util.Optional;
 
 public interface LocationRepository extends JpaRepository<BatchLocation, Long> {
 
-    Optional<BatchLocation> findByBatchId(Long batchId);
+    Optional<BatchLocation> findByLocationCode(String code);
 }

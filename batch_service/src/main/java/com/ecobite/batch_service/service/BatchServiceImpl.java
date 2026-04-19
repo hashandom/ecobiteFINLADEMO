@@ -1,6 +1,8 @@
 package com.ecobite.batch_service.service;
 
 
+import com.ecobite.batch_service.KafKaEventProducer.BatchEventProducer;
+import com.ecobite.batch_service.dto.Kafkaevent.BatchEvent;
 import com.ecobite.batch_service.dto.request.AllocateBatchRequest;
 import com.ecobite.batch_service.dto.request.CreateBatchRequest;
 import com.ecobite.batch_service.dto.request.ReduceStockRequest;
@@ -24,6 +26,7 @@ import java.util.List;
 public class BatchServiceImpl implements BatchService{
     private final BatchRepository repository;
     private final ProductClient productClient;
+    private final BatchEventProducer producer;
 
     @Override
     public BatchResponse createBatch(CreateBatchRequest request) {
@@ -48,6 +51,14 @@ public class BatchServiceImpl implements BatchService{
                 .build();
 
         repository.save(batch);
+
+        BatchEvent event = new BatchEvent();
+        event.setEventType("BATCH_CREATED");
+        event.setProductName(product.getName());
+        event.setBatchId(batch.getId().toString());
+        event.setExpiryDate(batch.getExpiryDate().toString());
+
+        producer.sendEvent(event);
 
         return mapToResponse(batch);
     }
@@ -231,5 +242,6 @@ public class BatchServiceImpl implements BatchService{
 
         return allocations;
     }
+
 
 }

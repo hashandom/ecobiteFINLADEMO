@@ -1,13 +1,14 @@
 package com.ecobite.notification_service.service;
 
 
+import com.ecobite.notification_service.dto.event.BatchEvent;
+import com.ecobite.notification_service.dto.event.ProductEvent;
 import com.ecobite.notification_service.entity.Notification;
 
 import java.util.List;
 
 public interface NotificationService  {
-    Notification saveNotification(Notification notification);
+    void handleBatchEvent(BatchEvent event);
 
-    List<Notification> getAllNotifications();
-
+    void handleProductEvent(ProductEvent event);
 }

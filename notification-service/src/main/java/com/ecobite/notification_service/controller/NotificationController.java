@@ -1,7 +1,9 @@
 package com.ecobite.notification_service.controller;
 
 import com.ecobite.notification_service.entity.Notification;
+import com.ecobite.notification_service.repository.NotificationRepository;
 import com.ecobite.notification_service.service.NotificationService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -11,12 +13,12 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/notifications")
+@RequiredArgsConstructor
 public class NotificationController {
-    @Autowired
-    private NotificationService notificationService;
+    private final NotificationRepository repository;
 
     @GetMapping
-    public List<Notification> getNotifications() {
-        return notificationService.getAllNotifications();
+    public List<Notification> getAll() {
+        return repository.findAll();
     }
 }

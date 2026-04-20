@@ -1,7 +1,7 @@
 package com.ecobite.batch_service.KafkaConfig;
 
 import com.ecobite.batch_service.dto.Kafkaevent.BatchEvent;
-import com.fasterxml.jackson.databind.JsonSerializer;
+import org.springframework.kafka.support.serializer.JsonSerializer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

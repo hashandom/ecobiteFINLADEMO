@@ -36,6 +36,8 @@ public class kafkaConsumerConfig {
         // Security (IMPORTANT: avoid "*" in production)
         config.put(JsonDeserializer.TRUSTED_PACKAGES,
                 "com.ecobite.notification_service.dto.event");
+        config.put(JsonDeserializer.VALUE_DEFAULT_TYPE, BatchEvent.class);
+        config.put(JsonDeserializer.USE_TYPE_INFO_HEADERS, false);
 
         return config;
     }

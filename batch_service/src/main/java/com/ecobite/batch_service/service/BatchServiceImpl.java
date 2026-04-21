@@ -55,8 +55,8 @@ public class BatchServiceImpl implements BatchService{
         BatchEvent event = new BatchEvent();
         event.setEventType("BATCH_CREATED");
         event.setProductName(product.getName());
-        event.setBatchId(batch.getId().toString());
-        event.setExpiryDate(batch.getExpiryDate().toString());
+        event.setBatchId(batch.getId());
+        event.setExpiryDate(batch.getExpiryDate());
 
         producer.sendEvent(event);
 

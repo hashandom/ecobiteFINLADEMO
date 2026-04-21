@@ -14,39 +14,42 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class NotificationServiceImpl implements NotificationService {
-
-    private final NotificationRepository repository;
+    private final NotificationRepository notificationRepository;
 
     @Override
     public void handleBatchEvent(BatchEvent event) {
-        String message = "Batch " + event.getBatchId() +
-                " of " + event.getProductName() +
-                " expires on " + event.getExpiryDate();
-        saveNotification(message, "BATCH");
+        if ("BATCH_EXPIRING".equals(event.getEventType())) {
+            String message = "Batch " + event.getBatchId() +
+                    " of " + event.getProductName() +
+                    " expires on " + event.getExpiryDate();
+            saveNotification(message, "EXPIRY_ALERT");
+        }
+        else if ("BATCH_CREATED".equals(event.getEventType())) {
+            String message = "New batch created: " + event.getBatchId() +
+                    " for " + event.getProductName();
+            saveNotification(message, "BATCH_CREATED");
+        }
     }
 
     @Override
     public void handleProductEvent(ProductEvent event) {
-        String message = "Low stock for " + event.getProductName() +
-                " remaining: " + event.getRemainingStock();
-        saveNotification(message, "PRODUCT");
+        if ("STOCK_LOW".equals(event.getEventType())) {
+            String message = "Low stock for " + event.getProductName() +
+                    " remaining: " + event.getRemainingStock();
+            saveNotification(message, "STOCK_ALERT");
+        }
     }
 
-
     private void saveNotification(String message, String type) {
-
         Notification notification = Notification.builder()
                 .message(message)
                 .type(type)
                 .status("SENT")
                 .createdAt(LocalDateTime.now())
                 .build();
-
-        repository.save(notification);
-
+        notificationRepository.save(notification);
         System.out.println("Notification Saved: " + message);
     }
-
 
 
 }

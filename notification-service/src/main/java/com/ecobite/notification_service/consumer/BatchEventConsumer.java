@@ -20,4 +20,5 @@ public class BatchEventConsumer {
         System.out.println("Batch Event Received: " + event);
         service.handleBatchEvent(event);
     }
+
 }

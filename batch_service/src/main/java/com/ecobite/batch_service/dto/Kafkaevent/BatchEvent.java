@@ -14,4 +14,5 @@ public class BatchEvent {
     private String productName;
     private Long batchId;
     private LocalDate expiryDate;
+    private int remainingQuantity;
 }

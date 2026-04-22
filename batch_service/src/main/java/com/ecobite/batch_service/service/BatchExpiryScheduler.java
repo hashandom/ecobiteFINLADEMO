@@ -33,7 +33,8 @@ public class BatchExpiryScheduler {
                     "BATCH_EXPIRING",
                     batch.getBatchNumber(),
                     batch.getId(),
-                    batch.getExpiryDate()
+                    batch.getExpiryDate(),
+                    batch.getRemainingQuantity()
             );
 
             producer.sendEvent(event);

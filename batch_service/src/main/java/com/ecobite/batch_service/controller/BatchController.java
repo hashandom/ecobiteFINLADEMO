@@ -23,6 +23,15 @@ import java.util.List;
 public class BatchController {
     private final BatchServiceImpl service;
 
+    @PostMapping("/reduce/{batchId}")
+    public String reduceStock(
+            @PathVariable Long batchId,
+            @RequestBody ReduceStockRequest request) {
+
+        service.reduceStock(batchId, request);
+        return "Stock updated successfully";
+    }
+
     @GetMapping("/expiring-soon")
     public ResponseEntity<List<BatchResponse>> getExpiringSoon(
             @RequestParam int days) {
@@ -57,13 +66,6 @@ public class BatchController {
         return ResponseEntity.ok(service.getBatchesByProduct(productId));
     }
 
-    @PutMapping("/{id}/reduce-stock")
-    public ResponseEntity<BatchResponse> reduceStock(
-            @PathVariable Long id,
-            @RequestBody ReduceStockRequest request){
-
-        return ResponseEntity.ok(service.reduceStock(id, request));
-    }
 
     @PutMapping("/{id}/spoil")
     public ResponseEntity<BatchResponse> spoilBatch(@PathVariable Long id){

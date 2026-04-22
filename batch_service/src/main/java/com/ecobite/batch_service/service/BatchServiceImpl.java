@@ -90,7 +90,7 @@ public class BatchServiceImpl implements BatchService{
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Batch not found"));
 
-        //  Status-based validation (clear messages)
+        // Status validation
         switch (batch.getStatus()) {
 
             case "SPOILED":
@@ -103,14 +103,13 @@ public class BatchServiceImpl implements BatchService{
                 throw new RuntimeException("Batch is expired");
 
             case "ACTIVE":
-                // continue
                 break;
 
             default:
                 throw new RuntimeException("Invalid batch status");
         }
 
-        //  Stock validation
+        // Stock validation
         if (batch.getRemainingQuantity() <= 0) {
             throw new RuntimeException("No stock available in this batch");
         }
@@ -119,12 +118,24 @@ public class BatchServiceImpl implements BatchService{
             throw new RuntimeException("Not enough stock available");
         }
 
-        // Reduce stock
-        batch.setRemainingQuantity(
-                batch.getRemainingQuantity() - request.getSoldQuantity()
-        );
+        int newQty = batch.getRemainingQuantity() - request.getSoldQuantity();
+        batch.setRemainingQuantity(newQty);
 
         repository.save(batch);
+
+        if (newQty <= 20) { // threshold
+
+            BatchEvent event = new BatchEvent();
+            event.setEventType("STOCK_REDUCED");
+            event.setProductName(batch.getProductId()); // change if you have productName
+            event.setBatchId(batch.getId());
+            event.setExpiryDate(batch.getExpiryDate());
+            event.setRemainingQuantity(newQty);
+
+            producer.sendEvent(event);
+
+            System.out.println("Stock reduced alert sent for batch: " + batch.getId());
+        }
 
         return mapToResponse(batch);
     }

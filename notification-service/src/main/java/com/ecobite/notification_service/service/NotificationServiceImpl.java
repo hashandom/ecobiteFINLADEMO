@@ -2,6 +2,7 @@ package com.ecobite.notification_service.service;
 
 import com.ecobite.notification_service.dto.event.BatchEvent;
 import com.ecobite.notification_service.dto.event.ProductEvent;
+import com.ecobite.notification_service.dto.event.SupplierEvent;
 import com.ecobite.notification_service.entity.Notification;
 import com.ecobite.notification_service.repository.NotificationRepository;
 import lombok.RequiredArgsConstructor;
@@ -38,6 +39,12 @@ public class NotificationServiceImpl implements NotificationService {
                     " remaining: " + event.getRemainingStock();
             saveNotification(message, "STOCK_ALERT");
         }
+    }
+
+    @Override
+    public void handleSupplierEvent(SupplierEvent event) {
+        String message = "New Supplier Added: " + event.getSupplierName();
+        saveNotification(message, "SUPPLIER");
     }
 
     private void saveNotification(String message, String type) {

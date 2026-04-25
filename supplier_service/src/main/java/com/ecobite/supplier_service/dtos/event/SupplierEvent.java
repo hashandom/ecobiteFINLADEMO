@@ -1,10 +1,10 @@
-package com.ecobite.notification_service.dto.event;
+package com.ecobite.supplier_service.dtos.event;
 
 import lombok.Data;
 
 @Data
 public class SupplierEvent {
-    private String eventType;
+    private String eventType; // CREATED
     private String supplierName;
     private String supplierId;
 }

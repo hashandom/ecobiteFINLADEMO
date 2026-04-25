@@ -1,9 +1,11 @@
 package com.ecobite.supplier_service.service;
 
-import com.ecobite.supplier_service.DTOs.AssignProductRequestDTO;
-import com.ecobite.supplier_service.DTOs.ProductResponseDTO;
-import com.ecobite.supplier_service.DTOs.SupplierRequestDTO;
-import com.ecobite.supplier_service.DTOs.SupplierResponseDTO;
+import com.ecobite.supplier_service.dtos.AssignProductRequestDTO;
+import com.ecobite.supplier_service.dtos.ProductResponseDTO;
+import com.ecobite.supplier_service.dtos.SupplierRequestDTO;
+import com.ecobite.supplier_service.dtos.SupplierResponseDTO;
+import com.ecobite.supplier_service.dtos.event.SupplierEvent;
+import com.ecobite.supplier_service.kafka.SupplierEventProducer;
 import com.ecobite.supplier_service.entity.Supplier;
 import com.ecobite.supplier_service.entity.SupplierProduct;
 import com.ecobite.supplier_service.feign.ProductClient;
@@ -20,6 +22,7 @@ public class SupplierServiceImpl implements SupplierService {
     private final SupplierRepository supplierRepository;
     private final SupplierProductRepository supplierProductRepository;
     private final ProductClient productClient;
+    private final SupplierEventProducer producer;
 
     @Override
     public SupplierResponseDTO createSupplier(SupplierRequestDTO dto) {
@@ -30,7 +33,13 @@ public class SupplierServiceImpl implements SupplierService {
         supplier.setPhone(dto.getPhone());
         supplier.setRating(0.0);
 
-        supplierRepository.save(supplier);
+       Supplier saved = supplierRepository.save(supplier);
+
+        SupplierEvent event = new SupplierEvent();
+        event.setEventType("CREATED");
+        event.setSupplierId(saved.getId().toString());
+        event.setSupplierName(saved.getName());
+        producer.sendSupplierEvent(event);
 
         return mapToResponse(supplier);
     }

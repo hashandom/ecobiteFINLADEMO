@@ -3,6 +3,7 @@ package com.ecobite.notification_service.KafkaConfig;
 
 import com.ecobite.notification_service.dto.event.BatchEvent;
 import com.ecobite.notification_service.dto.event.ProductEvent;
+import com.ecobite.notification_service.dto.event.SupplierEvent;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.context.annotation.*;
@@ -95,6 +96,28 @@ public class kafkaConsumerConfig {
 
         factory.setConsumerFactory(productConsumerFactory());
 
+        return factory;
+    }
+
+
+    // ---------------- SUPPLIER EVENT ----------------
+    @Bean
+    public ConsumerFactory<String, SupplierEvent> supplierConsumerFactory() {
+
+        Map<String, Object> config = new HashMap<>(baseConfig());
+        config.put(JsonDeserializer.VALUE_DEFAULT_TYPE, SupplierEvent.class);
+        return new DefaultKafkaConsumerFactory<>(
+                config,
+                new StringDeserializer(),
+                new JsonDeserializer<>(SupplierEvent.class)
+        );
+    }
+
+    @Bean
+    public ConcurrentKafkaListenerContainerFactory<String, SupplierEvent> supplierKafkaListenerFactory() {
+        ConcurrentKafkaListenerContainerFactory<String, SupplierEvent> factory =
+                new ConcurrentKafkaListenerContainerFactory<>();
+        factory.setConsumerFactory(supplierConsumerFactory());
         return factory;
     }
 }

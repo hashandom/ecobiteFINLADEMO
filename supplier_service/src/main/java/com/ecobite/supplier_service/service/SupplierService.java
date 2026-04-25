@@ -1,10 +1,9 @@
 package com.ecobite.supplier_service.service;
 
-import com.ecobite.supplier_service.DTOs.AssignProductRequestDTO;
-import com.ecobite.supplier_service.DTOs.ProductResponseDTO;
-import com.ecobite.supplier_service.DTOs.SupplierRequestDTO;
-import com.ecobite.supplier_service.DTOs.SupplierResponseDTO;
-import com.ecobite.supplier_service.entity.Supplier;
+import com.ecobite.supplier_service.dtos.AssignProductRequestDTO;
+import com.ecobite.supplier_service.dtos.ProductResponseDTO;
+import com.ecobite.supplier_service.dtos.SupplierRequestDTO;
+import com.ecobite.supplier_service.dtos.SupplierResponseDTO;
 
 import java.util.List;
 

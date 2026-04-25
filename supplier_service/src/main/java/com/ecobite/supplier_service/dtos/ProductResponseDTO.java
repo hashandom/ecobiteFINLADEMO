@@ -1,4 +1,4 @@
-package com.ecobite.supplier_service.DTOs;
+package com.ecobite.supplier_service.dtos;
 
 import lombok.Data;
 

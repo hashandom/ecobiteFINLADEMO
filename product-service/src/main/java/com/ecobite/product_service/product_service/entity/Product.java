@@ -73,5 +73,15 @@ public class Product {
 
     private double unitPrice;
 
+    public boolean isLowStockAlertSent() {
+        return lowStockAlertSent;
+    }
+
+    public void setLowStockAlertSent(boolean lowStockAlertSent) {
+        this.lowStockAlertSent = lowStockAlertSent;
+    }
+
+    private boolean lowStockAlertSent;
+
     }
 

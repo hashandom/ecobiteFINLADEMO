@@ -4,7 +4,9 @@ import lombok.Data;
 
 @Data
 public class ProductEvent {
-    private String eventType; // LOW_STOCK
+    private String eventType;
+    private String productId;
     private String productName;
-    private int remainingStock;
+    private int stock;
+    private int reorderLevel;
 }

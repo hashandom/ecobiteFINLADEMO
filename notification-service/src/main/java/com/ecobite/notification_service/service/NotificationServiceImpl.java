@@ -34,10 +34,18 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     public void handleProductEvent(ProductEvent event) {
-        if ("STOCK_LOW".equals(event.getEventType())) {
-            String message = "Low stock for " + event.getProductName() +
-                    " remaining: " + event.getRemainingStock();
-            saveNotification(message, "STOCK_ALERT");
+        switch (event.getEventType()) {
+
+            case "LOW_STOCK":
+                String message = "⚠️ Low stock for " + event.getProductName() +
+                        " remaining: " + event.getStock() +
+                        " (Reorder Level: " + event.getReorderLevel() + ")";
+
+                saveNotification(message, "STOCK_ALERT");
+                break;
+
+            default:
+                System.out.println("Unknown product event: " + event.getEventType());
         }
     }
 

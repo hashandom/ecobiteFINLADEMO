@@ -2,8 +2,10 @@ package com.ecobite.product_service.product_service.service;
 
 import com.ecobite.product_service.product_service.dto.ProductRequest;
 import com.ecobite.product_service.product_service.dto.ProductResponse;
+import com.ecobite.product_service.product_service.dto.event.ProductEvent;
 import com.ecobite.product_service.product_service.entity.Product;
 import com.ecobite.product_service.product_service.exception.ResourceNotFoundException;
+import com.ecobite.product_service.product_service.kafkaEventProducer.ProductEventProducer;
 import com.ecobite.product_service.product_service.repository.ProductRepository;
 import org.springframework.stereotype.Service;
 
@@ -13,9 +15,11 @@ import java.util.stream.Collectors;
 @Service
 public class ProductServiceImpl implements ProductService {
     private final ProductRepository repository;
+    private final ProductEventProducer producer;
 
-    public ProductServiceImpl(ProductRepository repository) {
+    public ProductServiceImpl(ProductRepository repository, ProductEventProducer producer) {
         this.repository = repository;
+        this.producer = producer;
     }
 
     private String generateProductId() {
@@ -120,8 +124,29 @@ public class ProductServiceImpl implements ProductService {
 
         product.setStock(stock);
 
-        repository.save(product);
+        // LOW STOCK ALERT
+        if (stock < product.getReorderLevel() && !product.isLowStockAlertSent()) {
 
+            ProductEvent event = new ProductEvent();
+            event.setEventType("LOW_STOCK");
+            event.setProductId(product.getId());
+            event.setProductName(product.getName());
+            event.setStock(stock);
+            event.setReorderLevel(product.getReorderLevel());
+
+            producer.sendEvent(event);
+
+            product.setLowStockAlertSent(true);
+
+            System.out.println("Low stock alert sent for product: " + product.getId());
+        }
+
+        // RESET ALERT
+        if (stock >= product.getReorderLevel()) {
+            product.setLowStockAlertSent(false);
+        }
+
+        repository.save(product);
         return mapToResponse(product);
     }
 

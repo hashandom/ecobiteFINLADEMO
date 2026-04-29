@@ -24,5 +24,10 @@ public class KafkaTopicConfig {
         return new NewTopic("supplier-events", 1, (short) 1);
     }
 
+    @Bean
+    public NewTopic ReorderTopic() {
+        return new NewTopic("reorder-events", 1, (short) 1);
+    }
+
 
 }

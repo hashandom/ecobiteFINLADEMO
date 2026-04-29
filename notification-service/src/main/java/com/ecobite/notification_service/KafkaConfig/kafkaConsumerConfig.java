@@ -3,6 +3,7 @@ package com.ecobite.notification_service.KafkaConfig;
 
 import com.ecobite.notification_service.dto.event.BatchEvent;
 import com.ecobite.notification_service.dto.event.ProductEvent;
+import com.ecobite.notification_service.dto.event.ReorderEvent;
 import com.ecobite.notification_service.dto.event.SupplierEvent;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
@@ -118,6 +119,31 @@ public class kafkaConsumerConfig {
         ConcurrentKafkaListenerContainerFactory<String, SupplierEvent> factory =
                 new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(supplierConsumerFactory());
+        return factory;
+    }
+
+    // ---------------- REORDER EVENT ----------------
+    @Bean
+    public ConsumerFactory<String, ReorderEvent> reorderConsumerFactory() {
+
+        Map<String, Object> config = new HashMap<>(baseConfig());
+        config.put(JsonDeserializer.VALUE_DEFAULT_TYPE, ReorderEvent.class);
+
+        return new DefaultKafkaConsumerFactory<>(
+                config,
+                new StringDeserializer(),
+                new JsonDeserializer<>(ReorderEvent.class)
+        );
+    }
+
+    @Bean
+    public ConcurrentKafkaListenerContainerFactory<String, ReorderEvent> reorderKafkaListenerFactory() {
+
+        ConcurrentKafkaListenerContainerFactory<String, ReorderEvent> factory =
+                new ConcurrentKafkaListenerContainerFactory<>();
+
+        factory.setConsumerFactory(reorderConsumerFactory());
+
         return factory;
     }
 }

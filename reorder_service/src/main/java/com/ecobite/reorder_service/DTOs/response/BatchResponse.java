@@ -1,4 +1,4 @@
-package com.ecobite.reorder_service.DTOs;
+package com.ecobite.reorder_service.DTOs.response;
 
 import lombok.Data;
 

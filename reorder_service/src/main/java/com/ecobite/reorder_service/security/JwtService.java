@@ -1,4 +1,4 @@
-package com.ecobite.batch_service.security;
+package com.ecobite.reorder_service.security;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;

@@ -1,25 +1,22 @@
 package com.ecobite.reorder_service.controller;
 
-import com.ecobite.reorder_service.entity.Reorder;
+import com.ecobite.reorder_service.DTOs.request.ReorderRequest;
+import com.ecobite.reorder_service.DTOs.response.ReorderResponse;
 import com.ecobite.reorder_service.service.ReorderService;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/reorders")
 public class ReorderController {
-    @Autowired
-    private ReorderService reorderService;
+    private final ReorderService service;
 
-    @PostMapping("/create")
-    public Reorder createReorder(@RequestBody Reorder reorder) {
-        return reorderService.createReorder(reorder);
+    public ReorderController(ReorderService service) {
+        this.service = service;
     }
 
-    @GetMapping
-    public List<Reorder> getAllReorders() {
-        return reorderService.getAllReorders();
+    @PostMapping
+    public ResponseEntity<ReorderResponse> create(@RequestBody ReorderRequest request) {
+        return ResponseEntity.ok(service.createReorder(request));
     }
 }

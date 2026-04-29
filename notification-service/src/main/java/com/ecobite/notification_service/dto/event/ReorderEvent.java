@@ -1,15 +1,13 @@
-package com.ecobite.reorder_service.DTOs.event;
+package com.ecobite.notification_service.dto.event;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
 public class ReorderEvent {
     private String productId;
     private Long supplierId;
     private int quantity;
+    private String status;
     private String message;
+    private long timestamp;
 }

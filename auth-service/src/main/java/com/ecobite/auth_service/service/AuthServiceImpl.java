@@ -127,6 +127,10 @@ public class AuthServiceImpl implements AuthService{
 
     @Override
     public String forgotPassword(ForgotPasswordRequest request) {
+
+        if (request.getEmail() == null) {
+            throw new RuntimeException("Email is required");
+        }
         User user = repository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new RuntimeException("Email not found"));
         String token = UUID.randomUUID().toString();

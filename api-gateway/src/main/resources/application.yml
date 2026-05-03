@@ -5,9 +5,18 @@ spring:
   application:
     name: api-gateway
 
+  datasource:
+    url: jdbc:mysql://localhost:3307/auth_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+    username: root
+    password: root
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
   cloud:
     gateway:
-
       routes:
         - id: auth-service
           uri: lb://auth-service
@@ -72,6 +81,7 @@ management:
   endpoint:
     gateway:
       enabled: true
+
 eureka:
   client:
     service-url:

@@ -22,7 +22,6 @@
     </option>
     <option name="ignoredFiles">
       <set>
-        <option value="$PROJECT_DIR$/qr_service/pom.xml" />
         <option value="$PROJECT_DIR$/recall-service/pom.xml" />
         <option value="$PROJECT_DIR$/spoilage-service/pom.xml" />
       </set>

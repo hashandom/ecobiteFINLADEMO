@@ -4,6 +4,7 @@ import com.ecobite.product_service.product_service.dto.ProductRequest;
 import com.ecobite.product_service.product_service.dto.ProductResponse;
 import com.ecobite.product_service.product_service.entity.Product;
 import com.ecobite.product_service.product_service.service.ProductService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,7 +20,7 @@ public class ProductController {
     }
 
     @PostMapping
-    public ProductResponse createProduct(@RequestBody ProductRequest request) {
+    public ProductResponse createProduct(@Valid @RequestBody ProductRequest request) {
         return service.createProduct(request);
     }
 
@@ -35,6 +36,7 @@ public class ProductController {
 
     @PutMapping("/{id}")
     public ProductResponse updateProduct(@PathVariable String id,
+                                         @Valid
                                          @RequestBody ProductRequest request) {
         return service.updateProduct(id, request);
     }

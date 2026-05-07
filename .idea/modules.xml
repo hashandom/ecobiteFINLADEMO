@@ -3,6 +3,8 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/ecobite(final demo).iml" filepath="$PROJECT_DIR$/.idea/ecobite(final demo).iml" />
+      <module fileurl="file://$PROJECT_DIR$/recall-service/recall-service.iml" filepath="$PROJECT_DIR$/recall-service/recall-service.iml" />
+      <module fileurl="file://$PROJECT_DIR$/spoilage-service/spoilage-service.iml" filepath="$PROJECT_DIR$/spoilage-service/spoilage-service.iml" />
     </modules>
   </component>
 </project>

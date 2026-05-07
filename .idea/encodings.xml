@@ -14,6 +14,7 @@
     <file url="file://$PROJECT_DIR$/recall-service/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/reorder_service/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/spoilage-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/spoilage_service/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/supplier_service/src/main/java" charset="UTF-8" />
   </component>
 </project>

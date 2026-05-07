@@ -18,6 +18,7 @@
         <option value="$PROJECT_DIR$/dashboard-service/pom.xml" />
         <option value="$PROJECT_DIR$/config-server/pom.xml" />
         <option value="$PROJECT_DIR$/reorder_service/pom.xml" />
+        <option value="$PROJECT_DIR$/spoilage_service/pom.xml" />
       </list>
     </option>
     <option name="ignoredFiles">

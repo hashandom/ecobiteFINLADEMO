@@ -45,7 +45,7 @@
         <module name="notification-service" />
         <module name="location-service" />
       </profile>
-      <profile name="Annotation profile for qr_service" enabled="true">
+      <profile name="Annotation profile for spoilage_service" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
@@ -53,6 +53,7 @@
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.46/lombok-1.18.46.jar" />
         </processorPath>
         <module name="qr_service" />
+        <module name="spoilage_service" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
@@ -77,6 +78,7 @@
       <module name="recall-service" options="-parameters" />
       <module name="reorder_service" options="-parameters" />
       <module name="spoilage-service" options="-parameters" />
+      <module name="spoilage_service" options="-parameters" />
       <module name="supplier_service" options="-parameters" />
     </option>
   </component>

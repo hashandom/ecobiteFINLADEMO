@@ -19,6 +19,8 @@
         <option value="$PROJECT_DIR$/config-server/pom.xml" />
         <option value="$PROJECT_DIR$/reorder_service/pom.xml" />
         <option value="$PROJECT_DIR$/spoilage_service/pom.xml" />
+        <option value="$PROJECT_DIR$/recall_service/recall_service/pom.xml" />
+        <option value="$PROJECT_DIR$/recall_service/pom.xml" />
       </list>
     </option>
     <option name="ignoredFiles">

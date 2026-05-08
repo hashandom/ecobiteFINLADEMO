@@ -9,6 +9,7 @@
         <outputRelativeToContentRoot value="true" />
         <module name="api-gateway" />
         <module name="config-server" />
+        <module name="recall_service" />
         <module name="discovery-server" />
         <module name="dashboard-service" />
       </profile>
@@ -76,6 +77,7 @@
       <module name="product-service" options="-parameters" />
       <module name="qr_service" options="-parameters" />
       <module name="recall-service" options="-parameters" />
+      <module name="recall_service" options="-parameters" />
       <module name="reorder_service" options="-parameters" />
       <module name="spoilage-service" options="-parameters" />
       <module name="spoilage_service" options="-parameters" />

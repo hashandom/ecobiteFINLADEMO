@@ -1,6 +1,6 @@
 package com.ecobite.dashboard_service.service;
 
-import com.ecobite.dashboard_service.dto.DashBoardDto;
+import com.ecobite.dashboard_service.dto.Response;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -9,9 +9,9 @@ public class DashboardServiceImpl implements DashboardService{
     private final RestTemplate restTemplate = new RestTemplate();
 
     @Override
-    public DashBoardDto getSummary() {
+    public Response getSummary() {
 
-        DashBoardDto summary = new DashBoardDto();
+        Response summary = new Response();
 
         Integer totalProducts = restTemplate.getForObject(
                 "http://localhost:8080/products/count", Integer.class);

@@ -1,6 +1,6 @@
 package com.ecobite.dashboard_service.controller;
 
-import com.ecobite.dashboard_service.dto.DashBoardDto;
+import com.ecobite.dashboard_service.dto.Response;
 import com.ecobite.dashboard_service.service.DashboardService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -12,7 +12,7 @@ public class DashboardController {
     private DashboardService dashboardService;
 
     @GetMapping("/summary")
-    public DashBoardDto getSummary() {
+    public Response getSummary() {
         return dashboardService.getSummary();
     }
 }

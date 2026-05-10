@@ -1,6 +1,6 @@
 package com.ecobite.dashboard_service.dto;
 
-public class DashBoardDto {
+public class Response {
     private int totalProducts;
     private int lowStockProducts;
     private int spoilageCount;

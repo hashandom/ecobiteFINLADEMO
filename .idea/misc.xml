@@ -21,6 +21,7 @@
         <option value="$PROJECT_DIR$/spoilage_service/pom.xml" />
         <option value="$PROJECT_DIR$/recall_service/recall_service/pom.xml" />
         <option value="$PROJECT_DIR$/recall_service/pom.xml" />
+        <option value="$PROJECT_DIR$/dashboard/pom.xml" />
       </list>
     </option>
     <option name="ignoredFiles">

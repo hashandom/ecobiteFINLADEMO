@@ -71,7 +71,47 @@ public class GlobalExceptionHandler {
                 .body(
                         new ApiResponse<>(
                                 500,
-                                "Internal server error",
+                                ex.getMessage(),
+                                null,
+                                LocalDateTime.now()
+                        )
+                );
+    }
+
+    @ExceptionHandler(
+            InvalidRequestException.class
+    )
+    public ResponseEntity<ApiResponse<?>>
+    handleInvalidRequest(
+            InvalidRequestException ex
+    ){
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(
+                        new ApiResponse<>(
+                                400,
+                                ex.getMessage(),
+                                null,
+                                LocalDateTime.now()
+                        )
+                );
+    }
+
+    @ExceptionHandler(
+            QrGenerationException.class
+    )
+    public ResponseEntity<ApiResponse<?>>
+    handleQrGeneration(
+            QrGenerationException ex
+    ){
+
+        return ResponseEntity.status(
+                        HttpStatus.INTERNAL_SERVER_ERROR
+                )
+                .body(
+                        new ApiResponse<>(
+                                500,
+                                ex.getMessage(),
                                 null,
                                 LocalDateTime.now()
                         )

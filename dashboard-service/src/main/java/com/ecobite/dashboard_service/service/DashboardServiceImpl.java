@@ -1,31 +1,63 @@
 package com.ecobite.dashboard_service.service;
 
-import com.ecobite.dashboard_service.dto.Response;
+import com.ecobite.dashboard_service.client.*;
+import com.ecobite.dashboard_service.dto.response.*;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
 @Service
+@RequiredArgsConstructor
 public class DashboardServiceImpl implements DashboardService{
-    private final RestTemplate restTemplate = new RestTemplate();
+    private final ProductClient productClient;
+    private final BatchClient batchClient;
+    private final SupplierClient supplierClient;
+    private final ReorderClient reorderClient;
+    private final NotificationClient notificationClient;
+    private final LocationClient locationClient;
 
     @Override
-    public Response getSummary() {
+    public DashboardOverviewResponse getDashboardOverview() {
 
-        Response summary = new Response();
+        return DashboardOverviewResponse.builder()
 
-        Integer totalProducts = restTemplate.getForObject(
-                "http://localhost:8080/products/count", Integer.class);
+                .inventory(
+                        InventorySummary.builder()
+                                .totalProducts(productClient.getProductCount())
+                                .lowStockProducts(productClient.getLowStockCount())
+                                .build()
+                )
 
-        Integer lowStock = restTemplate.getForObject(
-                "http://localhost:8080/products/low-stock/count", Integer.class);
+                .batch(
+                        BatchSummary.builder()
+                                .totalBatches(batchClient.getBatchCount())
+                                .expiringSoon(batchClient.getExpiringSoonCount())
+                                .build()
+                )
 
-        Integer spoilage = restTemplate.getForObject(
-                "http://localhost:8080/spoilage/count", Integer.class);
+                .supplier(
+                        SupplierSummary.builder()
+                                .totalSuppliers(supplierClient.getSupplierCount())
+                                .build()
+                )
 
-        summary.setTotalProducts(totalProducts != null ? totalProducts : 0);
-        summary.setLowStockProducts(lowStock != null ? lowStock : 0);
-        summary.setSpoilageCount(spoilage != null ? spoilage : 0);
+                .reorder(
+                        ReorderSummary.builder()
+                                .pendingReorders(reorderClient.getPendingReorders())
+                                .build()
+                )
 
-        return summary;
+                .notification(
+                        NotificationSummary.builder()
+                                .unreadNotifications(notificationClient.getUnreadCount())
+                                .build()
+                )
+
+                .location(
+                        LocationSummary.builder()
+                                .warehouseCount(locationClient.getWarehouseCount())
+                                .build()
+                )
+
+                .build();
     }
 }

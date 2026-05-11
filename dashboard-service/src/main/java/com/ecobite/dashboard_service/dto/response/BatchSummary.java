@@ -1,4 +1,12 @@
 package com.ecobite.dashboard_service.dto.response;
 
+import lombok.Builder;
+import lombok.Data;
+
+@Data
+@Builder
 public class BatchSummary {
+
+    private Long totalBatches;
+    private Long expiringSoon;
 }

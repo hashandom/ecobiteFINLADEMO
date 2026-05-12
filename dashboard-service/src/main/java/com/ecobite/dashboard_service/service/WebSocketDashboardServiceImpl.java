@@ -1,6 +1,6 @@
 package com.ecobite.dashboard_service.service;
 
-import com.ecobite.dashboard_service.dto.Response;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;

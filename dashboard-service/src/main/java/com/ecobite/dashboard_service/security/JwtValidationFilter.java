@@ -1,6 +1,6 @@
 package com.ecobite.dashboard_service.security;
 
-import com.ecobite.batch_service.security.JwtService;
+
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

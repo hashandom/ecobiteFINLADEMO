@@ -1,6 +1,5 @@
 package com.ecobite.dashboard_service.controller;
 
-import com.ecobite.dashboard_service.dto.Response;
 import com.ecobite.dashboard_service.dto.response.ApiResponse;
 import com.ecobite.dashboard_service.dto.response.DashboardOverviewResponse;
 import com.ecobite.dashboard_service.service.DashboardService;

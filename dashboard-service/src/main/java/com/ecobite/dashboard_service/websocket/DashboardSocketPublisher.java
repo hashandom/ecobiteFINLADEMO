@@ -5,54 +5,34 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
 public class DashboardSocketPublisher {
+    public void publishDashboardUpdate(
+            Object payload
+    ) {
 
-    private final SimpMessagingTemplate messagingTemplate;
-
-    /**
-     * Publish live dashboard updates
-     */
-    public void publishDashboardUpdate(Object payload) {
-
-        messagingTemplate.convertAndSend(
-                "/topic/dashboard",
-                payload
+        System.out.println(
+                "Dashboard Update: " + payload
         );
     }
 
-    /**
-     * Publish inventory updates
-     */
-    public void publishInventoryUpdate(Object payload) {
+    public void publishInventoryUpdate(
+            Object payload
+    ) {
 
-        messagingTemplate.convertAndSend(
-                "/topic/inventory",
-                payload
+        System.out.println(
+                "Inventory Update: " + payload
         );
     }
 
-    /**
-     * Publish reorder alerts
-     */
-    public void publishReorderAlert(Object payload) {
+    public void publishReorderUpdate(
+            Object payload
+    ) {
 
-        messagingTemplate.convertAndSend(
-                "/topic/reorders",
-                payload
+        System.out.println(
+                "Reorder Update: " + payload
         );
     }
 
-    /**
-     * Publish notification updates
-     */
-    public void publishNotificationUpdate(Object payload) {
-
-        messagingTemplate.convertAndSend(
-                "/topic/notifications",
-                payload
-        );
-    }
 
 
 }

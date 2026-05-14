@@ -11,12 +11,14 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/realtime")
 @RequiredArgsConstructor
 public class RealTimeDashboardController {
-    private final SimpMessagingTemplate messagingTemplate;
-
     @PostMapping("/publish")
-    public String publish(@RequestBody String message) {
-        messagingTemplate.convertAndSend("/topic/dashboard",
-                message);
+    public String publish(
+            @RequestBody String message
+    ) {
+
+        System.out.println(
+                "Realtime Message: " + message
+        );
 
         return "Published Successfully";
     }

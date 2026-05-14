@@ -13,6 +13,18 @@ services:
     volumes:
       - auth_mysql_data:/var/lib/mysql
 
+  dashboard-mysql:
+    image: mysql:8
+    container_name: dashboard-mysql
+    restart: always
+    ports:
+      - "3318:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: auth_db
+    volumes:
+      - dashboard_mysql_data:/var/lib/mysql
+
   product-mysql:
     image: mysql:8
     container_name: product-mysql
@@ -157,3 +169,4 @@ volumes:
   location_mysql_data:
   recall_mysql_data:
   notification_mysql_data:
+  dashboard_mysql_data:

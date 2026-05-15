@@ -22,4 +22,5 @@ public interface SupplierService {
 
     void deleteSupplier(Long id);
 
+    Long getSupplierCount();
 }

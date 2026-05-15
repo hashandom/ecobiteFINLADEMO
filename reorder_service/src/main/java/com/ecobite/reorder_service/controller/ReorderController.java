@@ -19,4 +19,9 @@ public class ReorderController {
     public ResponseEntity<ReorderResponse> create(@RequestBody ReorderRequest request) {
         return ResponseEntity.ok(service.createReorder(request));
     }
+
+    @GetMapping("/pending/count")
+    public Long getPendingReordersCount() {
+        return service.getPendingReordersCount();
+    }
 }

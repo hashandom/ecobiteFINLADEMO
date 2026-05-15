@@ -103,4 +103,9 @@ public class ReorderServiceImpl implements ReorderService {
                 .createdAt(reorder.getCreatedAt())
                 .build();
     }
+
+    @Override
+    public Long getPendingReordersCount() {
+        return repository.countByStatus("PENDING");
+    }
 }

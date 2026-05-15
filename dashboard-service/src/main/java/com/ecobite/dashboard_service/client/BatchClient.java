@@ -6,9 +6,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 @FeignClient(name = "batch-service", configuration = FeignConfig.class)
 public interface BatchClient {
-    @GetMapping("/api/batches/count")
+    @GetMapping("/batches/count")
     Long getBatchCount();
 
-    @GetMapping("/api/batches/expiring/count")
+    @GetMapping("/batches/expiring/count")
     Long getExpiringSoonCount();
 }

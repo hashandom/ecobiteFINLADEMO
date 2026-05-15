@@ -21,6 +21,11 @@ public class SupplierController {
         return supplierService.createSupplier(dto);
     }
 
+    @GetMapping("/count")
+    public Long getSupplierCount() {
+        return supplierService.getSupplierCount();
+    }
+
     @GetMapping("/{id}")
     public SupplierResponseDTO get(@PathVariable Long id) {
         return supplierService.getSupplier(id);

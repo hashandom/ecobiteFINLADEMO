@@ -24,4 +24,6 @@ public interface ProductService {
     List<ProductResponse> searchProduct(String name);
 
     List<ProductResponse> getProductsByCategory(String category);
+
+    Long getProductCount();
 }

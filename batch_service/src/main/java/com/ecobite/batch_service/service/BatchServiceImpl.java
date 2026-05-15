@@ -195,6 +195,20 @@ public class BatchServiceImpl implements BatchService{
         return mapToResponse(batch);
     }
 
+    @Override
+    public Long getBatchCount() {
+        return repository.count();
+    }
+
+    @Override
+    public Long getExpiringSoonCount() {
+        LocalDate today = LocalDate.now();
+        LocalDate future = today.plusDays(7);
+        return (long) repository
+                .findByExpiryDateBetween(today, future)
+                .size();
+    }
+
     private BatchResponse mapToResponse(Batch batch) {
 
         return BatchResponse.builder()

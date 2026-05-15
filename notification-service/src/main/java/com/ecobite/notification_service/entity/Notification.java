@@ -24,6 +24,6 @@ public class Notification {
     private String message;
     private String type; // EMAIL / SYSTEM
     private String status; // SENT / PENDING
-
     private LocalDateTime createdAt;
+    private Boolean isRead;
 }

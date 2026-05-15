@@ -46,10 +46,10 @@ public class SecurityConfig {
 //                        .hasRole("ADMIN")
 //
                          .requestMatchers("/products/**")
-                                .hasAnyRole("ADMIN","MANAGER","STAFF")
+                                .permitAll()
 
                         .anyRequest()
-                        .authenticated()
+                                .permitAll()
                 );
 
         return http.build();

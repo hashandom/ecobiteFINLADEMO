@@ -118,6 +118,11 @@ public class SupplierServiceImpl implements SupplierService {
         supplierRepository.delete(supplier);
     }
 
+    @Override
+    public Long getSupplierCount() {
+        return supplierRepository.count();
+    }
+
     private SupplierResponseDTO mapToResponse(Supplier supplier) {
         return new SupplierResponseDTO(
                 supplier.getId(),

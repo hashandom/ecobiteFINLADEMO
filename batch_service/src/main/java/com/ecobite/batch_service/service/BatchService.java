@@ -26,4 +26,7 @@ public interface BatchService {
 
     BatchResponse recallBatch(Long id);
 
+    Long getBatchCount();
+
+    Long getExpiringSoonCount();
 }

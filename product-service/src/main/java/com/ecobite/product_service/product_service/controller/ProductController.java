@@ -67,4 +67,14 @@ public class ProductController {
     public List<ProductResponse> getProductsByCategory(@PathVariable String category) {
         return service.getProductsByCategory(category);
     }
+
+    @GetMapping("/count")
+    public Long getProductCount() {
+        return service.getProductCount();
+    }
+
+    @GetMapping("/low-stock/count")
+    public Long getLowStockCount() {
+        return (long) service.getLowStockProducts().size();
+    }
 }

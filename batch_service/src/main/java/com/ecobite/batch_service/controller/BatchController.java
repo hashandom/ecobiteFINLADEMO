@@ -54,6 +54,16 @@ public class BatchController {
         return ResponseEntity.ok(service.createBatch(request));
     }
 
+    @GetMapping("/count")
+    public Long getBatchCount() {
+        return service.getBatchCount();
+    }
+
+    @GetMapping("/expiring/count")
+    public Long getExpiringSoonCount() {
+        return service.getExpiringSoonCount();
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<BatchResponse> getBatch(@PathVariable Long id){
         return ResponseEntity.ok(service.getBatchById(id));

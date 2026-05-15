@@ -6,9 +6,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 @FeignClient(name = "product-service", configuration = FeignConfig.class)
 public interface ProductClient {
-    @GetMapping("/api/products/count")
+    @GetMapping("/products/count")
     Long getProductCount();
 
-    @GetMapping("/api/products/low-stock/count")
+    @GetMapping("/products/low-stock/count")
     Long getLowStockCount();
 }

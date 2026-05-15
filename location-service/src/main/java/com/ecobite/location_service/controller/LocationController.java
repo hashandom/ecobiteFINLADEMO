@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/location")
+@RequestMapping("/locations")
 public class LocationController {
     private final LocationService service;
 
@@ -58,6 +58,12 @@ public class LocationController {
     @GetMapping
     public ResponseEntity<List<LocationResponse>> getAllLocations() {
         return ResponseEntity.ok(service.getAllLocations());
+    }
+
+    // Warehouse Count for Dashboard
+    @GetMapping("/warehouses/count")
+    public Long getWarehouseCount() {
+        return service.getWarehouseCount();
     }
 
     //  Get Inventory by Location

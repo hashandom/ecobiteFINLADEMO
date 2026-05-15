@@ -19,4 +19,5 @@ public interface LocationService {
 
     List<InventoryLocationResponse> getLocationsByBatch(Long batchId);
 
+    Long getWarehouseCount();
 }

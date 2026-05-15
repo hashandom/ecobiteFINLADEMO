@@ -8,6 +8,7 @@ import com.ecobite.location_service.exceptions.ResourceNotFoundException;
 import com.ecobite.location_service.feign.BatchClient;
 import com.ecobite.location_service.repository.InventoryLocationRepository;
 import com.ecobite.location_service.repository.LocationRepository;
+import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -154,6 +155,11 @@ public class LocationServiceImpl implements LocationService {
                 .stream()
                 .map(this::mapToInventoryResponse)
                 .toList();
+    }
+
+    @Override
+    public Long getWarehouseCount() {
+        return locationRepo.count();
     }
 
 

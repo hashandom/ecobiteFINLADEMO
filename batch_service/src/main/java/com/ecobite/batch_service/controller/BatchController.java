@@ -10,6 +10,7 @@ import com.ecobite.batch_service.dto.response.BatchAllocationResponse;
 import com.ecobite.batch_service.dto.response.BatchResponse;
 import com.ecobite.batch_service.service.BatchService;
 import com.ecobite.batch_service.service.BatchServiceImpl;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -49,7 +50,7 @@ public class BatchController {
 
     @PostMapping
     public ResponseEntity<BatchResponse> createBatch(
-            @RequestBody CreateBatchRequest request){
+           @Valid @RequestBody CreateBatchRequest request){
 
         return ResponseEntity.ok(service.createBatch(request));
     }

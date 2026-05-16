@@ -17,4 +17,6 @@ public interface BatchRepository extends JpaRepository<Batch, Long> {
             LocalDate date,
             String status
     );
+
+    boolean existsByBatchNumber(String batchNumber);
 }

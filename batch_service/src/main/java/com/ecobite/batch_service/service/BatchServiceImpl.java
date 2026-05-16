@@ -30,12 +30,31 @@ public class BatchServiceImpl implements BatchService{
 
     @Override
     public BatchResponse createBatch(CreateBatchRequest request) {
+        if (request.getExpiryDate().isBefore(request.getManufactureDate())) {
+            throw new RuntimeException(
+                    "Expiry date cannot be before manufacture date"
+            );
+        }
 
-        ProductResponse product =
-                productClient.getProduct(request.getProductId());
+        if (repository.existsByBatchNumber(request.getBatchNumber())) {
+            throw new RuntimeException(
+                    "Batch number already exists"
+            );
+        }
 
-        if (product == null) {
+        ProductResponse product;
+
+        try {
+
+            product = productClient.getProduct(request.getProductId());
+
+        } catch (feign.FeignException.NotFound ex) {
+
             throw new ResourceNotFoundException("Product not found");
+
+        } catch (feign.FeignException ex) {
+
+            throw new RuntimeException("Product service unavailable");
         }
 
         Batch batch = Batch.builder()
@@ -51,6 +70,11 @@ public class BatchServiceImpl implements BatchService{
                 .build();
 
         repository.save(batch);
+
+        productClient.addStock(
+                batch.getProductId(),
+                batch.getQuantity()
+        );
 
         BatchEvent event = new BatchEvent();
         event.setEventType("BATCH_CREATED");
@@ -119,9 +143,16 @@ public class BatchServiceImpl implements BatchService{
         }
 
         int newQty = batch.getRemainingQuantity() - request.getSoldQuantity();
+
         batch.setRemainingQuantity(newQty);
 
         repository.save(batch);
+
+        // DEDUCT PRODUCT STOCK
+            productClient.deductStock(
+                batch.getProductId(),
+                request.getSoldQuantity()
+        );
 
         if (newQty <= 20) { // threshold
 

@@ -26,4 +26,8 @@ public interface ProductService {
     List<ProductResponse> getProductsByCategory(String category);
 
     Long getProductCount();
+
+    ProductResponse addStock(String id, int quantity);
+
+    ProductResponse deductStock(String id, int quantity);
 }

@@ -173,5 +173,32 @@ public class ProductServiceImpl implements ProductService {
         return repository.count();
     }
 
+    @Override
+    public ProductResponse addStock(String id, int quantity) {
+        Product product = repository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Product not found"));
+
+        // ADD quantity to existing stock
+        product.setStock(product.getStock() + quantity);
+        repository.save(product);
+        return mapToResponse(product);
+    }
+
+    @Override
+    public ProductResponse deductStock(String id, int quantity) {
+        Product product = repository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Product not found"));
+
+        if(product.getStock() < quantity){
+            throw new RuntimeException("Not enough stock");
+        }
+
+        product.setStock(product.getStock() - quantity);
+        repository.save(product);
+        return mapToResponse(product);
+    }
+
 
 }

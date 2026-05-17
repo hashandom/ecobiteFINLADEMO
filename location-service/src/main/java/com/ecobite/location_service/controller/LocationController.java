@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/locations")
+@RequestMapping("/location")
 public class LocationController {
     private final LocationService service;
 

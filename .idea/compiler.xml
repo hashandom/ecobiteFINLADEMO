@@ -10,6 +10,7 @@
         <module name="api-gateway" />
         <module name="batch_service" />
         <module name="config-server" />
+        <module name="product-service" />
         <module name="discovery-server" />
         <module name="dashboard-service" />
       </profile>
@@ -30,7 +31,6 @@
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.44/lombok-1.18.44.jar" />
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.44/lombok-1.18.44.jar" />
         </processorPath>
-        <module name="product-service" />
         <module name="auth-service" />
         <module name="reorder_service" />
         <module name="notification-service" />

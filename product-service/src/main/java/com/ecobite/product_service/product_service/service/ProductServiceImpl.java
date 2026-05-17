@@ -1,10 +1,12 @@
 package com.ecobite.product_service.product_service.service;
 
+import com.ecobite.product_service.product_service.dto.BatchResponse;
 import com.ecobite.product_service.product_service.dto.ProductRequest;
 import com.ecobite.product_service.product_service.dto.ProductResponse;
 import com.ecobite.product_service.product_service.dto.event.ProductEvent;
 import com.ecobite.product_service.product_service.entity.Product;
 import com.ecobite.product_service.product_service.exception.ResourceNotFoundException;
+import com.ecobite.product_service.product_service.feign.BatchClient;
 import com.ecobite.product_service.product_service.kafkaEventProducer.ProductEventProducer;
 import com.ecobite.product_service.product_service.repository.ProductRepository;
 import org.springframework.stereotype.Service;
@@ -16,10 +18,12 @@ import java.util.stream.Collectors;
 public class ProductServiceImpl implements ProductService {
     private final ProductRepository repository;
     private final ProductEventProducer producer;
+    private final BatchClient batchClient;
 
-    public ProductServiceImpl(ProductRepository repository, ProductEventProducer producer) {
+    public ProductServiceImpl(ProductRepository repository, ProductEventProducer producer, BatchClient batchClient) {
         this.repository = repository;
         this.producer = producer;
+        this.batchClient = batchClient;
     }
 
     private String generateProductId() {
@@ -99,9 +103,29 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public void deleteProduct(String id) {
-
         Product product = repository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Product not found"));
+        List<BatchResponse> batches;
+        try {
+
+            batches = batchClient.getBatchesByProduct(id);
+
+        } catch (Exception ex) {
+
+            throw new RuntimeException(
+                    "Batch service unavailable"
+            );
+        }
+        System.out.println("Product ID: " + id);
+        System.out.println("Batches found: " + batches.size());
+
+        //BLOCK deletion if batches exist
+        if (!batches.isEmpty()) {
+            throw new RuntimeException(
+                    "Cannot delete product. Existing batches found."
+            );
+        }
 
         repository.delete(product);
     }
@@ -173,32 +197,32 @@ public class ProductServiceImpl implements ProductService {
         return repository.count();
     }
 
-    @Override
-    public ProductResponse addStock(String id, int quantity) {
-        Product product = repository.findById(id)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Product not found"));
+//    @Override
+//    public ProductResponse addStock(String id, int quantity) {
+//        Product product = repository.findById(id)
+//                .orElseThrow(() ->
+//                        new ResourceNotFoundException("Product not found"));
+//        // ADD quantity to existing stock
+//        product.setStock(product.getStock() + quantity);
+//        repository.save(product);
+//        return mapToResponse(product);
+//    }
 
-        // ADD quantity to existing stock
-        product.setStock(product.getStock() + quantity);
-        repository.save(product);
-        return mapToResponse(product);
-    }
 
-    @Override
-    public ProductResponse deductStock(String id, int quantity) {
-        Product product = repository.findById(id)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Product not found"));
-
-        if(product.getStock() < quantity){
-            throw new RuntimeException("Not enough stock");
-        }
-
-        product.setStock(product.getStock() - quantity);
-        repository.save(product);
-        return mapToResponse(product);
-    }
+//    @Override
+//    public ProductResponse deductStock(String id, int quantity) {
+//        Product product = repository.findById(id)
+//                .orElseThrow(() ->
+//                        new ResourceNotFoundException("Product not found"));
+//
+//        if(product.getStock() < quantity){
+//            throw new RuntimeException("Not enough stock");
+//        }
+//
+//        product.setStock(product.getStock() - quantity);
+//        repository.save(product);
+//        return mapToResponse(product);
+//    }
 
 
 }

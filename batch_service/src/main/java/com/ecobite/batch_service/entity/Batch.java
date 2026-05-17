@@ -37,4 +37,7 @@ public class Batch {
 
     private String status;
 
+    @Column(nullable = false)
+    private boolean expiryAlertSent = false;
+
 }

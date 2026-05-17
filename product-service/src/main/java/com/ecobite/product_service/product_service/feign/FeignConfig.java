@@ -1,4 +1,4 @@
-package com.ecobite.batch_service.feign;
+package com.ecobite.product_service.product_service.feign;
 
 import feign.RequestInterceptor;
 import jakarta.servlet.http.HttpServletRequest;

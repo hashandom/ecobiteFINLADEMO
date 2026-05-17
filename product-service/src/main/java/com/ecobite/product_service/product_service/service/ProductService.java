@@ -27,7 +27,8 @@ public interface ProductService {
 
     Long getProductCount();
 
-    ProductResponse addStock(String id, int quantity);
+   // ProductResponse addStock(String id, int quantity);
 
-    ProductResponse deductStock(String id, int quantity);
+    //ProductResponse deductStock(String id, int quantity);
+
 }

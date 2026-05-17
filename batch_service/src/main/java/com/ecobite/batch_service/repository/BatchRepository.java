@@ -7,16 +7,44 @@ import java.time.LocalDate;
 import java.util.List;
 
 public interface BatchRepository extends JpaRepository<Batch, Long> {
+    //Get all batches for a product
     List<Batch> findByProductId(String productId);
 
-    List<Batch> findByProductIdAndRemainingQuantityGreaterThanOrderByExpiryDateAsc(String productId, int qty);
+    //FIFO allocation (ACTIVE batches only)
+    List<Batch>
+    findByProductIdAndStatusAndRemainingQuantityGreaterThanOrderByExpiryDateAsc(
+            String productId,
+            String status,
+            int qty
+    );
 
-    List<Batch> findByExpiryDateBetween(LocalDate start, LocalDate end);
+    //Get expiring ACTIVE batches
+    List<Batch> findByExpiryDateBetweenAndStatus(
+            LocalDate start,
+            LocalDate end,
+            String status
+    );
 
+    // Scheduler - expired ACTIVE batches
     List<Batch> findByExpiryDateBeforeAndStatus(
             LocalDate date,
             String status
     );
 
+    // Duplicate batch validation
     boolean existsByBatchNumber(String batchNumber);
+
+    //  Product stock recalculation
+    List<Batch> findByProductIdAndStatus(
+            String productId,
+            String status
+    );
+
+
+    List<Batch>
+    findByExpiryDateBetweenAndStatusAndExpiryAlertSentFalse(
+            LocalDate start,
+            LocalDate end,
+            String status
+    );
 }

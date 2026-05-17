@@ -7,6 +7,7 @@ import com.ecobite.auth_service.entity.User;
 import com.ecobite.auth_service.repository.BlackListedTokenRepository;
 import com.ecobite.auth_service.repository.UserRepository;
 import com.ecobite.auth_service.security.JwtService;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -72,11 +73,13 @@ public class AuthServiceImpl implements AuthService{
                 user.setLocked(true);
             }
 
+
             repository.save(user);
 
             throw new RuntimeException("Invalid password");
         }
 
+        user.setLocked(false);
         user.setFailedAttempts(0);
         repository.save(user);
 
@@ -115,6 +118,7 @@ public class AuthServiceImpl implements AuthService{
         return "Password updated successfully";
     }
 
+    @Transactional
     public String unlockAccount(String username){
 
         User user = repository.findByUsername(username)

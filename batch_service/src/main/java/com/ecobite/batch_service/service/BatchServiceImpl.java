@@ -23,7 +23,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class BatchServiceImpl implements BatchService{
+public class BatchServiceImpl implements BatchService {
     private final BatchRepository repository;
     private final ProductClient productClient;
     private final BatchEventProducer producer;
@@ -71,9 +71,10 @@ public class BatchServiceImpl implements BatchService{
 
         repository.save(batch);
 
-        productClient.addStock(
+        int totalStock = calculateTotalStock(batch.getProductId());
+        productClient.updateStock(
                 batch.getProductId(),
-                batch.getQuantity()
+                totalStock
         );
 
         BatchEvent event = new BatchEvent();
@@ -114,6 +115,12 @@ public class BatchServiceImpl implements BatchService{
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Batch not found"));
 
+        if (batch.getExpiryDate().isBefore(LocalDate.now())) {
+            batch.setStatus("EXPIRED");
+            repository.save(batch);
+            throw new RuntimeException("Batch is expired");
+        }
+
         // Status validation
         switch (batch.getStatus()) {
 
@@ -148,10 +155,10 @@ public class BatchServiceImpl implements BatchService{
 
         repository.save(batch);
 
-        // DEDUCT PRODUCT STOCK
-            productClient.deductStock(
+        int totalStock = calculateTotalStock(batch.getProductId());
+        productClient.updateStock(
                 batch.getProductId(),
-                request.getSoldQuantity()
+                totalStock
         );
 
         if (newQty <= 20) { // threshold
@@ -173,12 +180,14 @@ public class BatchServiceImpl implements BatchService{
 
     @Override
     public List<BatchResponse> getExpiringSoon(int days) {
-
         LocalDate today = LocalDate.now();
         LocalDate future = today.plusDays(days);
-
         List<Batch> batches =
-                repository.findByExpiryDateBetween(today, future);
+                repository.findByExpiryDateBetweenAndStatus(
+                        today,
+                        future,
+                        "ACTIVE"
+                );
 
         return batches.stream()
                 .map(this::mapToResponse)
@@ -187,11 +196,13 @@ public class BatchServiceImpl implements BatchService{
 
     @Override
     public List<BatchResponse> getAvailableBatches(String productId) {
-
         List<Batch> batches =
                 repository
-                        .findByProductIdAndRemainingQuantityGreaterThanOrderByExpiryDateAsc(
-                                productId, 0);
+                        .findByProductIdAndStatusAndRemainingQuantityGreaterThanOrderByExpiryDateAsc(
+                                productId,
+                                "ACTIVE",
+                                0
+                        );
 
         return batches.stream()
                 .map(this::mapToResponse)
@@ -200,29 +211,33 @@ public class BatchServiceImpl implements BatchService{
 
     @Override
     public BatchResponse spoilBatch(Long id) {
-
         Batch batch = repository.findById(id)
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Batch not found"));
-
         batch.setStatus("SPOILED");
-
+        batch.setRemainingQuantity(0);
         repository.save(batch);
-
+        int totalStock = calculateTotalStock(batch.getProductId());
+        productClient.updateStock(
+                batch.getProductId(),
+                totalStock
+        );
         return mapToResponse(batch);
     }
 
     @Override
     public BatchResponse recallBatch(Long id) {
-
         Batch batch = repository.findById(id)
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Batch not found"));
-
         batch.setStatus("RECALLED");
-
+        batch.setRemainingQuantity(0);
         repository.save(batch);
-
+        int totalStock = calculateTotalStock(batch.getProductId());
+        productClient.updateStock(
+                batch.getProductId(),
+                totalStock
+        );
         return mapToResponse(batch);
     }
 
@@ -231,12 +246,17 @@ public class BatchServiceImpl implements BatchService{
         return repository.count();
     }
 
+
     @Override
     public Long getExpiringSoonCount() {
         LocalDate today = LocalDate.now();
         LocalDate future = today.plusDays(7);
         return (long) repository
-                .findByExpiryDateBetween(today, future)
+                .findByExpiryDateBetweenAndStatus(
+                        today,
+                        future,
+                        "ACTIVE"
+                )
                 .size();
     }
 
@@ -256,20 +276,32 @@ public class BatchServiceImpl implements BatchService{
                 .build();
     }
 
+    private int calculateTotalStock(String productId){
+        return repository
+                .findByProductIdAndStatus(productId, "ACTIVE")
+                .stream()
+                .mapToInt(Batch::getRemainingQuantity)
+                .sum();
+    }
+
     @Transactional
-    public List<BatchAllocationResponse> allocateBatch(AllocateBatchRequest request){
+    public List<BatchAllocationResponse> allocateBatch(AllocateBatchRequest request) {
 
         int requiredQty = request.getQuantity();
 
         List<Batch> batches =
-                repository.findByProductIdAndRemainingQuantityGreaterThanOrderByExpiryDateAsc(
-                        request.getProductId(),0);
+                repository
+                        .findByProductIdAndStatusAndRemainingQuantityGreaterThanOrderByExpiryDateAsc(
+                                request.getProductId(),
+                                "ACTIVE",
+                                0
+                        );
 
         List<BatchAllocationResponse> allocations = new ArrayList<>();
 
-        for(Batch batch : batches){
+        for (Batch batch : batches) {
 
-            if(requiredQty <= 0){
+            if (requiredQty <= 0) {
                 break;
             }
 
@@ -292,10 +324,18 @@ public class BatchServiceImpl implements BatchService{
             repository.save(batch);
         }
 
-        if(requiredQty > 0){
+        if (requiredQty > 0) {
             throw new RuntimeException("Not enough stock available");
         }
 
+        int totalStock = calculateTotalStock(
+                request.getProductId()
+        );
+
+        productClient.updateStock(
+                request.getProductId(),
+                totalStock
+        );
         return allocations;
     }
 

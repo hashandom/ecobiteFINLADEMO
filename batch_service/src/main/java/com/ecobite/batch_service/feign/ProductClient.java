@@ -12,15 +12,21 @@ public interface ProductClient {
     @GetMapping("/products/{id}")
     ProductResponse getProduct(@PathVariable("id") String id);
 
-    @PutMapping("/products/add-stock/{id}")
-    void addStock(
-            @PathVariable("id") String id,
-            @RequestParam("quantity") int quantity
+    @PutMapping("/products/update-stock/{id}")
+    ProductResponse updateStock(
+            @PathVariable String id,
+            @RequestParam int stock
     );
 
-    @PutMapping("/products/deduct-stock/{id}")
-    void deductStock(
-            @PathVariable("id") String id,
-            @RequestParam("quantity") int quantity
-    );
+//    @PutMapping("/products/add-stock/{id}")
+//    void addStock(
+//            @PathVariable("id") String id,
+//            @RequestParam("quantity") int quantity
+//    );
+//
+//    @PutMapping("/products/deduct-stock/{id}")
+//    void deductStock(
+//            @PathVariable("id") String id,
+//            @RequestParam("quantity") int quantity
+//    );
 }

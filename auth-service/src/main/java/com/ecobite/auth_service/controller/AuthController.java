@@ -39,6 +39,7 @@ public class AuthController {
                 null);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/unlock/{username}")
     public ApiResponse unlockAccount(@PathVariable String username){
         service.unlockAccount(username);

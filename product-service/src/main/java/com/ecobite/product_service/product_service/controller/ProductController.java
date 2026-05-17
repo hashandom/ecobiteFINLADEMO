@@ -24,20 +24,20 @@ public class ProductController {
         return service.createProduct(request);
     }
 
-    @PutMapping("/add-stock/{id}")
-    public ProductResponse addStock(
-            @PathVariable String id,
-            @RequestParam int quantity) {
+//    @PutMapping("/add-stock/{id}")
+//    public ProductResponse addStock(
+//            @PathVariable String id,
+//            @RequestParam int quantity) {
+//
+//        return service.addStock(id, quantity);
+//    }
 
-        return service.addStock(id, quantity);
-    }
-
-    @PutMapping("/deduct-stock/{id}")
-    public ProductResponse deductStock(
-            @PathVariable String id,
-            @RequestParam int quantity) {
-        return service.deductStock(id, quantity);
-    }
+//    @PutMapping("/deduct-stock/{id}")
+//    public ProductResponse deductStock(
+//            @PathVariable String id,
+//            @RequestParam int quantity) {
+//        return service.deductStock(id, quantity);
+//    }
 
     @GetMapping
     public List<ProductResponse> getAllProducts() {

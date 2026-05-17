@@ -1,4 +1,4 @@
-package com.ecobite.batch_service.service;
+package com.ecobite.batch_service.scheduler;
 
 import com.ecobite.batch_service.KafKaEventProducer.BatchEventProducer;
 import com.ecobite.batch_service.dto.Kafkaevent.BatchEvent;

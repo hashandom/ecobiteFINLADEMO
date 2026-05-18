@@ -7,12 +7,13 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="api-gateway" />
         <module name="batch_service" />
         <module name="config-server" />
-        <module name="product-service" />
         <module name="discovery-server" />
         <module name="dashboard-service" />
+        <module name="location-service" />
+        <module name="api-gateway" />
+        <module name="product-service" />
       </profile>
       <profile name="Annotation profile for qr_service" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
@@ -34,7 +35,6 @@
         <module name="auth-service" />
         <module name="reorder_service" />
         <module name="notification-service" />
-        <module name="location-service" />
       </profile>
       <profile name="Annotation profile for supplier_service" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />

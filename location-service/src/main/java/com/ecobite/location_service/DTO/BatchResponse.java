@@ -1,5 +1,6 @@
 package com.ecobite.location_service.DTO;
 
+
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -19,9 +20,9 @@ public class BatchResponse {
 
     private Long supplierId;
 
-    private int quantity;
+    private Integer quantity;
 
-    private int remainingQuantity;
+    private Integer remainingQuantity;
 
     private LocalDate manufactureDate;
 

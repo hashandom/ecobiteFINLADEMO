@@ -11,7 +11,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 @Configuration
 public class FeignConfig {
 
-    private static final String SYSTEM_TOKEN = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzdXBlcmFkbWluIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzc4ODQwOTE2LCJleHAiOjE3Nzg5MjczMTZ9.gYnm2qNw267JBRv19hWE1CpC_5JEMQhVkJzOC8C030k";
+    private static final String SYSTEM_TOKEN = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzdXBlcmFkbWluIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzc5MTI2MDM1LCJleHAiOjE3NzkyMTI0MzV9.nwFCvMSw3FzavvUYFG12q1tOz46H835UWwKeNKTR4lk";
 
     @Bean
     public RequestInterceptor requestInterceptor() {

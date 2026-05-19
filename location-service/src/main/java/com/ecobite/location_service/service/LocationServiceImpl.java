@@ -1,5 +1,6 @@
 package com.ecobite.location_service.service;
 
+import org.springframework.transaction.annotation.Transactional;
 import com.ecobite.location_service.DTO.*;
 import com.ecobite.location_service.entity.BatchLocation;
 import com.ecobite.location_service.entity.InventoryLocation;
@@ -8,12 +9,11 @@ import com.ecobite.location_service.exceptions.ResourceNotFoundException;
 import com.ecobite.location_service.feign.BatchClient;
 import com.ecobite.location_service.repository.InventoryLocationRepository;
 import com.ecobite.location_service.repository.LocationRepository;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.transaction.Transactional;
+import feign.FeignException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -36,6 +36,16 @@ public class LocationServiceImpl implements LocationService {
         location.setLocationCode(generateCode(request));
         location.setCreatedAt(LocalDateTime.now());
 
+        String locationCode = generateCode(request);
+
+        if (locationRepo.existsByLocationCode(locationCode)) {
+
+            throw new BadRequestException(
+                    "Location already exists"
+            );
+        }
+
+        location.setLocationCode(locationCode);
         locationRepo.save(location);
 
         return mapToResponse(location);
@@ -45,27 +55,112 @@ public class LocationServiceImpl implements LocationService {
     @Override
     @Transactional
     public void assignBatch(AssignBatchRequest request) {
-
         BatchLocation location = locationRepo.findById(request.getLocationId())
-                .orElseThrow(() -> new ResourceNotFoundException("Location not found"));
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Location not found"));
 
-        // Validate batch from batch-service
-        batchClient.getBatch(request.getBatchId());
+        BatchResponse batch;
 
-        if (location.getCurrentOccupancy() + request.getQuantity() > location.getCapacity()) {
-            throw new BadRequestException("Location capacity exceeded");
+        try {
+            batch = batchClient.getBatch(request.getBatchId());
+        } catch (FeignException.NotFound ex) {
+            throw new ResourceNotFoundException("Batch not found");
         }
 
-        InventoryLocation inventory = new InventoryLocation();
-        inventory.setBatchId(request.getBatchId());
-        inventory.setLocationId(request.getLocationId());
-        inventory.setQuantity(request.getQuantity());
-        inventory.setAssignedAt(LocalDateTime.now());
+        if (request.getQuantity() <= 0) {
 
+            throw new BadRequestException(
+                    "Quantity must be greater than 0"
+            );
+        }
+        // Quantity validation
+        if (request.getQuantity() > batch.getRemainingQuantity()) {
+
+            throw new BadRequestException(
+                    "Requested quantity exceeds available batch quantity"
+            );
+        }
+
+        // Expiry validation
+        if (batch.getExpiryDate().isBefore(LocalDate.now())) {
+
+            throw new BadRequestException(
+                    "Cannot assign expired batch"
+            );
+        }
+
+        // Status validation
+        if ("RECALL".equalsIgnoreCase(batch.getStatus())) {
+
+            throw new BadRequestException(
+                    "Cannot assign recalled batch"
+            );
+        }
+
+        if ("DAMAGED".equalsIgnoreCase(batch.getStatus())) {
+
+            throw new BadRequestException(
+                    "Cannot assign damaged batch"
+            );
+        }
+
+        if ("EXPIRED".equalsIgnoreCase(batch.getStatus())) {
+
+            throw new BadRequestException(
+                    "Cannot assign expired batch"
+            );
+        }
+
+        if ("QUARANTINED".equalsIgnoreCase(batch.getStatus())) {
+
+            throw new BadRequestException(
+                    "Cannot assign quarantined batch"
+            );
+        }
+
+        // Location capacity validation
+        if (location.getCurrentOccupancy() + request.getQuantity()
+                > location.getCapacity()) {
+
+            throw new BadRequestException(
+                    "Location capacity exceeded"
+            );
+        }
+
+        // Check if batch already exists in same location
+        InventoryLocation inventory =
+                inventoryRepo.findByBatchIdAndLocationId(
+                        request.getBatchId(),
+                        request.getLocationId()
+                ).orElse(null);
+
+// If already exists → increase quantity
+        if (inventory != null) {
+
+            inventory.setQuantity(
+                    inventory.getQuantity() + request.getQuantity()
+            );
+
+        } else {
+
+            // Create new inventory entry
+            inventory = new InventoryLocation();
+
+            inventory.setBatchId(request.getBatchId());
+            inventory.setLocationId(request.getLocationId());
+            inventory.setQuantity(request.getQuantity());
+            inventory.setAssignedAt(LocalDateTime.now());
+        }
+
+// Save inventory
         inventoryRepo.save(inventory);
 
-        location.setCurrentOccupancy(location.getCurrentOccupancy() + request.getQuantity());
+        location.setCurrentOccupancy(
+                location.getCurrentOccupancy() + request.getQuantity()
+        );
+
         locationRepo.save(location);
+
     }
 
 
@@ -73,58 +168,155 @@ public class LocationServiceImpl implements LocationService {
     @Transactional
     public void moveBatch(MoveBatchRequest request) {
 
+        // Validate source location
         BatchLocation from = locationRepo.findById(request.getFromLocationId())
-                .orElseThrow(() -> new ResourceNotFoundException("From location not found"));
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("From location not found"));
 
+        // Validate destination location
         BatchLocation to = locationRepo.findById(request.getToLocationId())
-                .orElseThrow(() -> new ResourceNotFoundException("To location not found"));
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("To location not found"));
+        if (request.getQuantity() <= 0) {
 
-        InventoryLocation sourceInventory = inventoryRepo.findByBatchId(request.getBatchId())
-                .stream()
-                .filter(i -> i.getLocationId().equals(from.getId()))
-                .findFirst()
-                .orElseThrow(() -> new ResourceNotFoundException("Batch not in source location"));
+            throw new BadRequestException(
+                    "Quantity must be greater than 0"
+            );
+        }
 
+        // Prevent moving to same location
+        if (from.getId().equals(to.getId())) {
+            throw new BadRequestException(
+                    "Source and destination locations cannot be the same"
+            );
+        }
 
+        // Validate batch from batch-service
+        BatchResponse batch;
+
+        try {
+            batch = batchClient.getBatch(request.getBatchId());
+        } catch (FeignException.NotFound ex) {
+            throw new ResourceNotFoundException("Batch not found");
+        }
+
+        // Expiry validation
+        if (batch.getExpiryDate().isBefore(LocalDate.now())) {
+
+            throw new BadRequestException(
+                    "Cannot move expired batch"
+            );
+        }
+
+        // Status validation
+        if ("RECALL".equalsIgnoreCase(batch.getStatus())) {
+
+            throw new BadRequestException(
+                    "Cannot move recalled batch"
+            );
+        }
+
+        if ("DAMAGED".equalsIgnoreCase(batch.getStatus())) {
+
+            throw new BadRequestException(
+                    "Cannot move damaged batch"
+            );
+        }
+
+        if ("EXPIRED".equalsIgnoreCase(batch.getStatus())) {
+
+            throw new BadRequestException(
+                    "Cannot move expired batch"
+            );
+        }
+
+        if ("QUARANTINED".equalsIgnoreCase(batch.getStatus())) {
+
+            throw new BadRequestException(
+                    "Cannot move quarantined batch"
+            );
+        }
+
+        // Find source inventory
+        InventoryLocation sourceInventory =
+                inventoryRepo.findByBatchIdAndLocationId(
+                        request.getBatchId(),
+                        from.getId()
+                ).orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Batch not in source location"
+                        ));
+
+        // Quantity validation
         if (sourceInventory.getQuantity() < request.getQuantity()) {
-            throw new BadRequestException("Insufficient quantity");
+
+            throw new BadRequestException(
+                    "Insufficient quantity"
+            );
         }
 
-        if (to.getCurrentOccupancy() + request.getQuantity() > to.getCapacity()) {
-            throw new BadRequestException("Target location full");
+        // Destination capacity validation
+        if (to.getCurrentOccupancy() + request.getQuantity()
+                > to.getCapacity()) {
+
+            throw new BadRequestException(
+                    "Target location full"
+            );
         }
 
-        int remainingQty = sourceInventory.getQuantity() - request.getQuantity();
+        // Reduce quantity from source
+        int remainingQty =
+                sourceInventory.getQuantity() - request.getQuantity();
 
         if (remainingQty == 0) {
-            inventoryRepo.delete(sourceInventory); // clean DB
+
+            // Remove source row completely
+            inventoryRepo.delete(sourceInventory);
+
         } else {
+
             sourceInventory.setQuantity(remainingQty);
             inventoryRepo.save(sourceInventory);
         }
 
-        InventoryLocation destinationInventory = inventoryRepo.findByBatchId(request.getBatchId())
-                .stream()
-                .filter(i -> i.getLocationId().equals(to.getId()))
-                .findFirst()
-                .orElse(null);
+        // Check if batch already exists in destination
+        InventoryLocation destinationInventory =
+                inventoryRepo.findByBatchIdAndLocationId(
+                        request.getBatchId(),
+                        to.getId()
+                ).orElse(null);
 
+        // Merge quantities if exists
         if (destinationInventory != null) {
+
             destinationInventory.setQuantity(
-                    destinationInventory.getQuantity() + request.getQuantity()
+                    destinationInventory.getQuantity()
+                            + request.getQuantity()
             );
+
             inventoryRepo.save(destinationInventory);
+
         } else {
+
+            // Create new inventory entry
             InventoryLocation newEntry = new InventoryLocation();
+
             newEntry.setBatchId(request.getBatchId());
             newEntry.setLocationId(to.getId());
             newEntry.setQuantity(request.getQuantity());
             newEntry.setAssignedAt(LocalDateTime.now());
+
             inventoryRepo.save(newEntry);
         }
 
-        from.setCurrentOccupancy(from.getCurrentOccupancy() - request.getQuantity());
-        to.setCurrentOccupancy(to.getCurrentOccupancy() + request.getQuantity());
+        // Update occupancy
+        from.setCurrentOccupancy(
+                from.getCurrentOccupancy() - request.getQuantity()
+        );
+
+        to.setCurrentOccupancy(
+                to.getCurrentOccupancy() + request.getQuantity()
+        );
 
         locationRepo.save(from);
         locationRepo.save(to);
@@ -159,14 +351,25 @@ public class LocationServiceImpl implements LocationService {
 
     @Override
     public Long getWarehouseCount() {
-        return locationRepo.count();
+        return locationRepo.countDistinctWarehouses();
     }
 
 
     private String generateCode(CreateLocationRequest request) {
-        return request.getWarehouse().toUpperCase() + "-"
-                + request.getSection().toUpperCase() + "-"
-                + request.getShelf().toUpperCase();
+
+        String warehouse = request.getWarehouse() != null
+                ? request.getWarehouse().toUpperCase()
+                : "UNKNOWN";
+
+        String section = request.getSection() != null
+                ? request.getSection().toUpperCase()
+                : "UNKNOWN";
+
+        String shelf = request.getShelf() != null
+                ? request.getShelf().toUpperCase()
+                : "UNKNOWN";
+
+        return warehouse + "-" + section + "-" + shelf;
     }
 
     private LocationResponse mapToResponse(BatchLocation location) {

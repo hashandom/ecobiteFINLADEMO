@@ -87,8 +87,18 @@ public class LocationServiceImpl implements LocationService {
 
         validateBatchStatus(batch, "assign");
 
+        // Total already assigned quantity
+        Integer totalAssigned =
+                inventoryRepo.getTotalAssignedQuantity(
+                        request.getBatchId()
+                );
+
+        // Remaining available quantity
+        int availableQuantity =
+                batch.getRemainingQuantity() - totalAssigned;
+
         // Quantity validation
-        if (request.getQuantity() > batch.getRemainingQuantity()) {
+        if (request.getQuantity() > availableQuantity) {
 
             throw new BadRequestException(
                     "Requested quantity exceeds available batch quantity"
@@ -111,7 +121,7 @@ public class LocationServiceImpl implements LocationService {
                         request.getLocationId()
                 ).orElse(null);
 
-// If already exists → increase quantity
+        // If already exists → increase quantity
         if (inventory != null) {
 
             inventory.setQuantity(
@@ -129,7 +139,7 @@ public class LocationServiceImpl implements LocationService {
             inventory.setAssignedAt(LocalDateTime.now());
         }
 
-// Save inventory
+        // Save inventory
         inventoryRepo.save(inventory);
 
         location.setCurrentOccupancy(
@@ -383,6 +393,13 @@ public class LocationServiceImpl implements LocationService {
 
             throw new BadRequestException(
                     "Cannot " + operation + " quarantined batch"
+            );
+        }
+
+        if ("SPOILED".equalsIgnoreCase(status)) {
+
+            throw new BadRequestException(
+                    "Cannot " + operation + " spoiled batch"
             );
         }
     }

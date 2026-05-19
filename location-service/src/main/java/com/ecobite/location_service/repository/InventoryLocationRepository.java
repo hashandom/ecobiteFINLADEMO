@@ -2,6 +2,7 @@ package com.ecobite.location_service.repository;
 
 import com.ecobite.location_service.entity.InventoryLocation;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 import java.util.Optional;
@@ -13,4 +14,10 @@ public interface InventoryLocationRepository extends JpaRepository<InventoryLoca
             Long batchId,
             Long locationId
     );
+    @Query("""
+       SELECT COALESCE(SUM(i.quantity), 0)
+       FROM InventoryLocation i
+       WHERE i.batchId = :batchId
+       """)
+    Integer getTotalAssignedQuantity(Long batchId);
 }

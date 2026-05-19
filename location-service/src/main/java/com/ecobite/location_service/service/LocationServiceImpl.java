@@ -27,17 +27,10 @@ public class LocationServiceImpl implements LocationService {
     @Override
     public LocationResponse createLocation(CreateLocationRequest request) {
 
-        BatchLocation location = new BatchLocation();
-        location.setWarehouse(request.getWarehouse());
-        location.setSection(request.getSection());
-        location.setShelf(request.getShelf());
-        location.setCapacity(request.getCapacity());
-        location.setCurrentOccupancy(0);
-        location.setLocationCode(generateCode(request));
-        location.setCreatedAt(LocalDateTime.now());
-
+        // Generate normalized location code
         String locationCode = generateCode(request);
 
+        // Check duplicate location
         if (locationRepo.existsByLocationCode(locationCode)) {
 
             throw new BadRequestException(
@@ -45,7 +38,25 @@ public class LocationServiceImpl implements LocationService {
             );
         }
 
+        BatchLocation location = new BatchLocation();
+
+        location.setWarehouse(
+                request.getWarehouse().trim().toUpperCase()
+        );
+
+        location.setSection(
+                request.getSection().trim().toUpperCase()
+        );
+
+        location.setShelf(
+                request.getShelf().trim().toUpperCase()
+        );
+
+        location.setCapacity(request.getCapacity());
+        location.setCurrentOccupancy(0);
         location.setLocationCode(locationCode);
+        location.setCreatedAt(LocalDateTime.now());
+
         locationRepo.save(location);
 
         return mapToResponse(location);
@@ -73,48 +84,14 @@ public class LocationServiceImpl implements LocationService {
                     "Quantity must be greater than 0"
             );
         }
+
+        validateBatchStatus(batch, "assign");
+
         // Quantity validation
         if (request.getQuantity() > batch.getRemainingQuantity()) {
 
             throw new BadRequestException(
                     "Requested quantity exceeds available batch quantity"
-            );
-        }
-
-        // Expiry validation
-        if (batch.getExpiryDate().isBefore(LocalDate.now())) {
-
-            throw new BadRequestException(
-                    "Cannot assign expired batch"
-            );
-        }
-
-        // Status validation
-        if ("RECALL".equalsIgnoreCase(batch.getStatus())) {
-
-            throw new BadRequestException(
-                    "Cannot assign recalled batch"
-            );
-        }
-
-        if ("DAMAGED".equalsIgnoreCase(batch.getStatus())) {
-
-            throw new BadRequestException(
-                    "Cannot assign damaged batch"
-            );
-        }
-
-        if ("EXPIRED".equalsIgnoreCase(batch.getStatus())) {
-
-            throw new BadRequestException(
-                    "Cannot assign expired batch"
-            );
-        }
-
-        if ("QUARANTINED".equalsIgnoreCase(batch.getStatus())) {
-
-            throw new BadRequestException(
-                    "Cannot assign quarantined batch"
             );
         }
 
@@ -200,42 +177,7 @@ public class LocationServiceImpl implements LocationService {
             throw new ResourceNotFoundException("Batch not found");
         }
 
-        // Expiry validation
-        if (batch.getExpiryDate().isBefore(LocalDate.now())) {
-
-            throw new BadRequestException(
-                    "Cannot move expired batch"
-            );
-        }
-
-        // Status validation
-        if ("RECALL".equalsIgnoreCase(batch.getStatus())) {
-
-            throw new BadRequestException(
-                    "Cannot move recalled batch"
-            );
-        }
-
-        if ("DAMAGED".equalsIgnoreCase(batch.getStatus())) {
-
-            throw new BadRequestException(
-                    "Cannot move damaged batch"
-            );
-        }
-
-        if ("EXPIRED".equalsIgnoreCase(batch.getStatus())) {
-
-            throw new BadRequestException(
-                    "Cannot move expired batch"
-            );
-        }
-
-        if ("QUARANTINED".equalsIgnoreCase(batch.getStatus())) {
-
-            throw new BadRequestException(
-                    "Cannot move quarantined batch"
-            );
-        }
+        validateBatchStatus(batch, "move");
 
         // Find source inventory
         InventoryLocation sourceInventory =
@@ -309,6 +251,13 @@ public class LocationServiceImpl implements LocationService {
             inventoryRepo.save(newEntry);
         }
 
+        // Prevent negative occupancy
+        if (from.getCurrentOccupancy() < request.getQuantity()) {
+
+            throw new BadRequestException(
+                    "Invalid occupancy update"
+            );
+        }
         // Update occupancy
         from.setCurrentOccupancy(
                 from.getCurrentOccupancy() - request.getQuantity()
@@ -358,15 +307,15 @@ public class LocationServiceImpl implements LocationService {
     private String generateCode(CreateLocationRequest request) {
 
         String warehouse = request.getWarehouse() != null
-                ? request.getWarehouse().toUpperCase()
+                ? request.getWarehouse().trim().toUpperCase()
                 : "UNKNOWN";
 
         String section = request.getSection() != null
-                ? request.getSection().toUpperCase()
+                ? request.getSection().trim().toUpperCase()
                 : "UNKNOWN";
 
         String shelf = request.getShelf() != null
-                ? request.getShelf().toUpperCase()
+                ? request.getShelf().trim().toUpperCase()
                 : "UNKNOWN";
 
         return warehouse + "-" + section + "-" + shelf;
@@ -390,5 +339,51 @@ public class LocationServiceImpl implements LocationService {
         res.setLocationId(inv.getLocationId());
         res.setQuantity(inv.getQuantity());
         return res;
+    }
+
+    private void validateBatchStatus(BatchResponse batch, String operation) {
+
+        // Expiry validation
+        if (batch.getExpiryDate() != null &&
+                batch.getExpiryDate().isBefore(LocalDate.now())) {
+
+            throw new BadRequestException(
+                    "Cannot " + operation + " expired batch"
+            );
+        }
+
+        String status = batch.getStatus();
+
+        if (status == null) {
+            return;
+        }
+
+        if ("RECALL".equalsIgnoreCase(status)) {
+
+            throw new BadRequestException(
+                    "Cannot " + operation + " recalled batch"
+            );
+        }
+
+        if ("DAMAGED".equalsIgnoreCase(status)) {
+
+            throw new BadRequestException(
+                    "Cannot " + operation + " damaged batch"
+            );
+        }
+
+        if ("EXPIRED".equalsIgnoreCase(status)) {
+
+            throw new BadRequestException(
+                    "Cannot " + operation + " expired batch"
+            );
+        }
+
+        if ("QUARANTINED".equalsIgnoreCase(status)) {
+
+            throw new BadRequestException(
+                    "Cannot " + operation + " quarantined batch"
+            );
+        }
     }
 }

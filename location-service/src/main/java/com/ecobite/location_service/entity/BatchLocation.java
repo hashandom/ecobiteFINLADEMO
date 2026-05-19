@@ -17,6 +17,7 @@ public class BatchLocation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(unique = true, nullable = false)
     private String locationCode; // e.g. FREEZER-A1
 
     private String warehouse;

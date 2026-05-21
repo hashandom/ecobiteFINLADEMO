@@ -13,6 +13,8 @@ import com.ecobite.supplier_service.repository.SupplierProductRepository;
 import com.ecobite.supplier_service.repository.SupplierRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import com.ecobite.supplier_service.exception.DuplicateResourceException;
+import com.ecobite.supplier_service.exception.ResourceNotFoundException;
 
 import java.util.List;
 
@@ -26,48 +28,61 @@ public class SupplierServiceImpl implements SupplierService {
 
     @Override
     public SupplierResponseDTO createSupplier(SupplierRequestDTO dto) {
+        if (supplierRepository.existsByName(dto.getName())) {
+            throw new DuplicateResourceException(
+                    "Supplier name already exists"
+            );
+        }
+        if (supplierRepository.existsByContactEmail(dto.getContactEmail())) {
+            throw new DuplicateResourceException(
+                    "Email already exists"
+            );
+        }
+        if (supplierRepository.existsByPhone(dto.getPhone())) {
+            throw new DuplicateResourceException(
+                    "Phone number already exists"
+            );
+        }
 
         Supplier supplier = new Supplier();
         supplier.setName(dto.getName());
         supplier.setContactEmail(dto.getContactEmail());
         supplier.setPhone(dto.getPhone());
         supplier.setRating(0.0);
-
-       Supplier saved = supplierRepository.save(supplier);
-
-        SupplierEvent event = new SupplierEvent();
-        event.setEventType("CREATED");
-        event.setSupplierId(saved.getId().toString());
-        event.setSupplierName(saved.getName());
-        producer.sendSupplierEvent(event);
+        supplierRepository.save(supplier);
 
         return mapToResponse(supplier);
+
     }
 
     @Override
     public SupplierResponseDTO getSupplier(Long id) {
 
         Supplier supplier = supplierRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Supplier not found"));
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Supplier not found"
+                        )
+                );
 
         return mapToResponse(supplier);
     }
 
     @Override
     public void assignProduct(AssignProductRequestDTO dto) {
-
         System.out.println("Calling product-service for ID: " + dto.getProductId());
         ProductResponseDTO product =
                 productClient.getProduct(dto.getProductId());
 
         if (product == null) {
-            throw new RuntimeException("Product not found");
+            throw new ResourceNotFoundException(
+                    "Product not found"
+            );
         }
 
         SupplierProduct mapping = new SupplierProduct();
         mapping.setSupplierId(dto.getSupplierId());
         mapping.setProductId(dto.getProductId());
-
         supplierProductRepository.save(mapping);
     }
 
@@ -94,14 +109,42 @@ public class SupplierServiceImpl implements SupplierService {
     @Override
     public SupplierResponseDTO updateSupplier(Long id, SupplierRequestDTO dto) {
         Supplier supplier = supplierRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Supplier not found"));
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Supplier not found"
+                        )
+                );
 
-        // Update fields
+        // Duplicate checks
+
+        if (!supplier.getName().equals(dto.getName())
+                && supplierRepository.existsByName(dto.getName())) {
+
+            throw new DuplicateResourceException(
+                    "Supplier name already exists"
+            );
+        }
+
+        if (!supplier.getContactEmail().equals(dto.getContactEmail())
+                && supplierRepository.existsByContactEmail(dto.getContactEmail())) {
+
+            throw new DuplicateResourceException(
+                    "Email already exists"
+            );
+        }
+
+        if (!supplier.getPhone().equals(dto.getPhone())
+                && supplierRepository.existsByPhone(dto.getPhone())) {
+
+            throw new DuplicateResourceException(
+                    "Phone number already exists"
+            );
+        }
+
         supplier.setName(dto.getName());
         supplier.setContactEmail(dto.getContactEmail());
         supplier.setPhone(dto.getPhone());
 
-        // Save updated supplier
         supplierRepository.save(supplier);
 
         return mapToResponse(supplier);
@@ -110,11 +153,13 @@ public class SupplierServiceImpl implements SupplierService {
     @Override
     public void deleteSupplier(Long id) {
         Supplier supplier = supplierRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Supplier not found"));
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Supplier not found"
+                        )
+                );
 
-        // 🔥 IMPORTANT: delete mappings first (avoid FK issues)
         supplierProductRepository.deleteAllBySupplierId(id);
-
         supplierRepository.delete(supplier);
     }
 

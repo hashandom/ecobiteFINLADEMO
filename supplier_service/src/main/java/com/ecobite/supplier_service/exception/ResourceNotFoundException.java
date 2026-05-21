@@ -1,4 +1,4 @@
-package com.ecobite.product_service.product_service.exception;
+package com.ecobite.supplier_service.exception;
 
 public class ResourceNotFoundException extends RuntimeException {
 

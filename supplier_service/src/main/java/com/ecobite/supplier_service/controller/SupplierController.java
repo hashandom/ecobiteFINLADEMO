@@ -6,9 +6,10 @@ import com.ecobite.supplier_service.dtos.SupplierRequestDTO;
 import com.ecobite.supplier_service.dtos.SupplierResponseDTO;
 import com.ecobite.supplier_service.service.SupplierService;
 import lombok.RequiredArgsConstructor;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
+
 
 @RestController
 @RequestMapping("/suppliers")
@@ -17,7 +18,9 @@ public class SupplierController {
     private final SupplierService supplierService;
 
     @PostMapping
-    public SupplierResponseDTO create(@RequestBody SupplierRequestDTO dto) {
+    public SupplierResponseDTO create(
+            @Valid @RequestBody SupplierRequestDTO dto
+    ) {
         return supplierService.createSupplier(dto);
     }
 
@@ -39,25 +42,33 @@ public class SupplierController {
     @PutMapping("/{id}")
     public SupplierResponseDTO update(
             @PathVariable Long id,
-            @RequestBody SupplierRequestDTO dto
+            @Valid @RequestBody SupplierRequestDTO dto
     ) {
         return supplierService.updateSupplier(id, dto);
     }
 
     @DeleteMapping("/{id}")
     public String delete(@PathVariable Long id) {
+
         supplierService.deleteSupplier(id);
+
         return "Supplier deleted successfully";
     }
 
     @PostMapping("/assign-product")
-    public String assignProduct(@RequestBody AssignProductRequestDTO dto) {
+    public String assignProduct(
+            @RequestBody AssignProductRequestDTO dto
+    ) {
+
         supplierService.assignProduct(dto);
+
         return "Product assigned to supplier";
     }
 
     @GetMapping("/{id}/products")
-    public List<ProductResponseDTO> getProducts(@PathVariable Long id) {
+    public List<ProductResponseDTO> getProducts(
+            @PathVariable Long id
+    ) {
         return supplierService.getProductsBySupplier(id);
     }
 }

@@ -6,5 +6,5 @@ import lombok.Data;
 public class ProductResponseDTO {
     private String id;
     private String name;
-    private Double price;
+    private Double unitPrice;
 }

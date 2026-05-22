@@ -23,4 +23,13 @@ public interface SupplierService {
     void deleteSupplier(Long id);
 
     Long getSupplierCount();
+
+    SupplierResponseDTO getBestSupplierForProduct(
+            String productId
+    );
+
+    SupplierResponseDTO updateSupplierRating(
+            Long supplierId,
+            Double rating
+    );
 }

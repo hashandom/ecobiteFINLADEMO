@@ -1,9 +1,6 @@
 package com.ecobite.supplier_service.controller;
 
-import com.ecobite.supplier_service.dtos.AssignProductRequestDTO;
-import com.ecobite.supplier_service.dtos.ProductResponseDTO;
-import com.ecobite.supplier_service.dtos.SupplierRequestDTO;
-import com.ecobite.supplier_service.dtos.SupplierResponseDTO;
+import com.ecobite.supplier_service.dtos.*;
 import com.ecobite.supplier_service.service.SupplierService;
 import lombok.RequiredArgsConstructor;
 import jakarta.validation.Valid;
@@ -70,5 +67,26 @@ public class SupplierController {
             @PathVariable Long id
     ) {
         return supplierService.getProductsBySupplier(id);
+    }
+
+    @GetMapping("/best/{productId}")
+    public SupplierResponseDTO getBestSupplier(
+            @PathVariable String productId
+    ) {
+
+        return supplierService
+                .getBestSupplierForProduct(productId);
+    }
+
+    @PutMapping("/{id}/rating")
+    public SupplierResponseDTO updateRating(
+            @PathVariable Long id,
+            @RequestBody UpdateSupplierRatingDTO dto
+    ) {
+
+        return supplierService.updateSupplierRating(
+                id,
+                dto.getRating()
+        );
     }
 }

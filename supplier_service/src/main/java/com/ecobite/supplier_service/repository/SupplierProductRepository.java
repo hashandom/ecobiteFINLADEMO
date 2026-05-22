@@ -8,4 +8,11 @@ import java.util.List;
 public interface SupplierProductRepository extends JpaRepository<SupplierProduct, Long> {
     List<SupplierProduct> findBySupplierId(Long supplierId);
     void deleteAllBySupplierId(Long supplierId);
+
+    boolean existsBySupplierIdAndProductId(
+            Long supplierId,
+            String productId
+    );
+
+    List<SupplierProduct> findByProductId(String productId);
 }

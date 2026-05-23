@@ -5,4 +5,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ReorderRepository extends JpaRepository<Reorder, Long> {
     Long countByStatus(String pending);
+
+    boolean existsByProductIdAndStatus(
+            String productId,
+            String status
+    );
+
 }

@@ -8,3 +8,11 @@ spring:
   profiles:
     active: default
 
+  jackson:
+    time-zone: Asia/Colombo
+
+  jpa:
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: Asia/Colombo

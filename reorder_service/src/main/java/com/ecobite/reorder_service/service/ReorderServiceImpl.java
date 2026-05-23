@@ -2,14 +2,18 @@ package com.ecobite.reorder_service.service;
 
 import com.ecobite.reorder_service.DTOs.event.ReorderEvent;
 import com.ecobite.reorder_service.DTOs.request.ReorderRequest;
+import com.ecobite.reorder_service.DTOs.response.ProductResponse;
 import com.ecobite.reorder_service.DTOs.response.ReorderResponse;
+import com.ecobite.reorder_service.DTOs.response.SupplierResponse;
 import com.ecobite.reorder_service.entity.Reorder;
 import com.ecobite.reorder_service.exception.BadRequestException;
+import com.ecobite.reorder_service.exception.ResourceNotFoundException;
 import com.ecobite.reorder_service.feign.BatchClient;
 import com.ecobite.reorder_service.feign.ProductClient;
 import com.ecobite.reorder_service.feign.SupplierClient;
 import com.ecobite.reorder_service.kafka.ReorderProducer;
 import com.ecobite.reorder_service.repository.ReorderRepository;
+import feign.FeignException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -36,14 +40,22 @@ public class ReorderServiceImpl implements ReorderService {
 
         // 🔹 1. Validate input
         if (request.getProductId() == null || request.getQuantity() <= 0) {
-            throw new BadRequestException("Invalid request data");
+            throw new BadRequestException("Invalid request product count");
         }
 
         // 🔹 2. Get product from product-service
-        var product = productClient.getProduct(request.getProductId());
+        ProductResponse product = null;
 
-        if (product == null) {
-            throw new BadRequestException("Product not found");
+        try {
+
+            product = productClient.getProduct(request.getProductId());
+
+        } catch (FeignException.NotFound ex) {
+
+            throw new ResourceNotFoundException(
+                    "Product with ID " + request.getProductId() + " not found"
+            );
+
         }
 
         // 🔹 3. Check reorder condition
@@ -66,16 +78,34 @@ public class ReorderServiceImpl implements ReorderService {
                 .orElseThrow(() -> new BadRequestException("No valid batch available"));
 
         //Get supplier
-        var supplier = supplierClient.getSupplier(batch.getSupplierId());
 
-        if (supplier == null) {
-            throw new BadRequestException("Supplier not found");
+        // 🔹 6. Get best supplier
+        SupplierResponse supplier;
+
+        try {
+
+            supplier = supplierClient.getBestSupplier(
+                    product.getId()
+            );
+
+        } catch (FeignException.NotFound ex) {
+
+            throw new ResourceNotFoundException(
+                    "Best supplier not found for product: "
+                            + product.getId()
+            );
+
+        } catch (FeignException ex) {
+
+            throw new RuntimeException(
+                    "Supplier service unavailable"
+            );
         }
 
         // 7. Save reorder
         Reorder reorder = Reorder.builder()
                 .productId(product.getId())
-                .supplierId(batch.getSupplierId())
+                .supplierId(supplier.getId())
                 .quantity(request.getQuantity())
                 .status("CREATED")
                 .createdAt(LocalDateTime.now())
@@ -86,7 +116,7 @@ public class ReorderServiceImpl implements ReorderService {
         // SEND EVENT
         ReorderEvent event = new ReorderEvent(
                 product.getId(),
-                batch.getSupplierId(),
+                supplier.getId(),
                 request.getQuantity(),
                 "Reorder created for product " + product.getId()
         );

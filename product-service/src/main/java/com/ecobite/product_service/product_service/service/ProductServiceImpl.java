@@ -58,7 +58,7 @@ public class ProductServiceImpl implements ProductService {
                 .id(generateProductId())
                 .name(request.getName())
                 .category(request.getCategory())
-                .stock(request.getStock())
+                .stock(0)
                 .reorderLevel(request.getReorderLevel())
                 .unitPrice(request.getUnitPrice())
                 .build();
@@ -93,7 +93,6 @@ public class ProductServiceImpl implements ProductService {
 
         product.setName(request.getName());
         product.setCategory(request.getCategory());
-        product.setStock(request.getStock());
         product.setReorderLevel(request.getReorderLevel());
         product.setUnitPrice(request.getUnitPrice());
         repository.save(product);

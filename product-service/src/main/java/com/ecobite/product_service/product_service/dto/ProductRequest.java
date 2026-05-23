@@ -16,10 +16,6 @@ public class ProductRequest {
     @NotBlank(message = "Category is required")
     private String category;
 
-    @NotNull(message = "Stock is required")
-    @Min(value = 0, message = "Stock cannot be negative")
-    private Integer stock;
-
     @NotNull(message = "Reorder level is required")
     @Min(value = 0, message = "Reorder level cannot be negative")
     private Integer reorderLevel;

@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 @FeignClient(name = "supplier-service" , configuration = FeignConfig.class)
 public interface SupplierClient {
-    @GetMapping("/suppliers/{id}")
-    SupplierResponse getSupplier(@PathVariable("id") Long id);
+    @GetMapping("/suppliers/best/{productId}")
+    SupplierResponse getBestSupplier(
+            @PathVariable("productId") String productId
+    );
 }

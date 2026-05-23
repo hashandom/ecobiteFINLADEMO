@@ -12,11 +12,13 @@ import com.ecobite.batch_service.dto.response.ProductResponse;
 import com.ecobite.batch_service.entity.Batch;
 import com.ecobite.batch_service.exception.ResourceNotFoundException;
 import com.ecobite.batch_service.feign.ProductClient;
+import com.ecobite.batch_service.feign.SupplierClient;
 import com.ecobite.batch_service.repository.BatchRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,8 +29,10 @@ public class BatchServiceImpl implements BatchService {
     private final BatchRepository repository;
     private final ProductClient productClient;
     private final BatchEventProducer producer;
+    private final SupplierClient supplierClient;
 
     @Override
+    @Transactional
     public BatchResponse createBatch(CreateBatchRequest request) {
         if (request.getExpiryDate().isBefore(request.getManufactureDate())) {
             throw new RuntimeException(
@@ -41,20 +45,58 @@ public class BatchServiceImpl implements BatchService {
                     "Batch number already exists"
             );
         }
+        if (request.getQuantity() <= 0) {
+            throw new RuntimeException(
+                    "Quantity must be greater than zero"
+            );
+        }
+
+        if (request.getPurchasePrice().compareTo(BigDecimal.ZERO) <= 0) {
+
+            throw new RuntimeException(
+                    "Purchase price must be greater than zero"
+            );
+        }
 
         ProductResponse product;
 
         try {
 
-            product = productClient.getProduct(request.getProductId());
+            product = productClient.getProduct(
+                    request.getProductId()
+            );
 
         } catch (feign.FeignException.NotFound ex) {
 
-            throw new ResourceNotFoundException("Product not found");
+            throw new ResourceNotFoundException(
+                    "Product not found"
+            );
 
         } catch (feign.FeignException ex) {
 
-            throw new RuntimeException("Product service unavailable");
+            throw new RuntimeException(
+                    "Product service unavailable"
+            );
+        }
+
+//  Supplier validation
+        try {
+
+            supplierClient.getSupplier(
+                    request.getSupplierId()
+            );
+
+        } catch (feign.FeignException.NotFound ex) {
+
+            throw new ResourceNotFoundException(
+                    "Supplier not found"
+            );
+
+        } catch (feign.FeignException ex) {
+
+            throw new RuntimeException(
+                    "Supplier service unavailable"
+            );
         }
 
         Batch batch = Batch.builder()
@@ -114,6 +156,11 @@ public class BatchServiceImpl implements BatchService {
         Batch batch = repository.findById(id)
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Batch not found"));
+        if (request.getSoldQuantity() <= 0) {
+            throw new RuntimeException(
+                    "Sold quantity must be greater than zero"
+            );
+        }
 
         if (batch.getExpiryDate().isBefore(LocalDate.now())) {
             batch.setStatus("EXPIRED");

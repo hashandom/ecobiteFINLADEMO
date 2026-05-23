@@ -17,7 +17,6 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, String>> handleNotFound(
             ResourceNotFoundException ex
     ) {
-
         Map<String, String> error = new HashMap<>();
         error.put("error", ex.getMessage());
         return new ResponseEntity<>(
@@ -34,10 +33,25 @@ public class GlobalExceptionHandler {
 
         Map<String, String> error = new HashMap<>();
         error.put("error", ex.getMessage());
-
         return new ResponseEntity<>(
                 error,
                 HttpStatus.CONFLICT
+        );
+    }
+
+    // ✅ Invalid rating
+    @ExceptionHandler(InvalidRatingException.class)
+    public ResponseEntity<Map<String, String>>
+    handleInvalidRating(
+            InvalidRatingException ex
+    ) {
+
+        Map<String, String> error =
+                new HashMap<>();
+        error.put("error", ex.getMessage());
+        return new ResponseEntity<>(
+                error,
+                HttpStatus.BAD_REQUEST
         );
     }
 
@@ -47,7 +61,8 @@ public class GlobalExceptionHandler {
             MethodArgumentNotValidException ex
     ) {
 
-        Map<String, String> errors = new HashMap<>();
+        Map<String, String> errors =
+                new HashMap<>();
         ex.getBindingResult()
                 .getFieldErrors()
                 .forEach(error ->
@@ -70,8 +85,8 @@ public class GlobalExceptionHandler {
     ) {
 
         ex.printStackTrace();
-
-        Map<String, String> error = new HashMap<>();
+        Map<String, String> error =
+                new HashMap<>();
         error.put("error", "Internal server error");
         return new ResponseEntity<>(
                 error,

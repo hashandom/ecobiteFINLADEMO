@@ -4,6 +4,7 @@ import com.ecobite.supplier_service.dtos.AssignProductRequestDTO;
 import com.ecobite.supplier_service.dtos.ProductResponseDTO;
 import com.ecobite.supplier_service.dtos.SupplierRequestDTO;
 import com.ecobite.supplier_service.dtos.SupplierResponseDTO;
+import com.ecobite.supplier_service.exception.InvalidRatingException;
 import com.ecobite.supplier_service.kafka.SupplierEventProducer;
 import com.ecobite.supplier_service.entity.Supplier;
 import com.ecobite.supplier_service.entity.SupplierProduct;
@@ -406,7 +407,8 @@ public class SupplierServiceImpl implements SupplierService {
         // validation
 
         if (rating < 0 || rating > 5) {
-            throw new RuntimeException(
+
+            throw new InvalidRatingException(
                     "Rating must be between 0 and 5"
             );
         }

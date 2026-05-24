@@ -11,9 +11,11 @@ import com.ecobite.batch_service.dto.response.BatchResponse;
 import com.ecobite.batch_service.dto.response.ProductResponse;
 import com.ecobite.batch_service.entity.Batch;
 import com.ecobite.batch_service.exception.ResourceNotFoundException;
+import com.ecobite.batch_service.feign.LocationClient;
 import com.ecobite.batch_service.feign.ProductClient;
 import com.ecobite.batch_service.feign.SupplierClient;
 import com.ecobite.batch_service.repository.BatchRepository;
+import feign.FeignException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -30,6 +32,7 @@ public class BatchServiceImpl implements BatchService {
     private final ProductClient productClient;
     private final BatchEventProducer producer;
     private final SupplierClient supplierClient;
+    private final LocationClient locationClient;
 
     @Override
     @Transactional
@@ -79,30 +82,57 @@ public class BatchServiceImpl implements BatchService {
             );
         }
 
-//  Supplier validation
+        // Supplier validation
         try {
 
             supplierClient.getSupplier(
                     request.getSupplierId()
             );
 
-        } catch (feign.FeignException.NotFound ex) {
+        } catch (FeignException.NotFound ex) {
 
             throw new ResourceNotFoundException(
                     "Supplier not found"
             );
 
-        } catch (feign.FeignException ex) {
+        } catch (FeignException ex) {
 
             throw new RuntimeException(
                     "Supplier service unavailable"
             );
         }
 
+        // Location validation
+        try {
+
+            locationClient.getLocation(
+                    request.getLocationId()
+            );
+
+        } catch (FeignException ex) {
+
+            System.out.println("Location Feign Error Status: "
+                    + ex.status());
+
+            System.out.println("Location Feign Error Message: "
+                    + ex.getMessage());
+
+            if (ex.status() == 404) {
+
+                throw new ResourceNotFoundException(
+                        "Location not found"
+                );
+            }
+
+            throw new RuntimeException(
+                    "Location service unavailable"
+            );
+        }
         Batch batch = Batch.builder()
                 .batchNumber(request.getBatchNumber())
                 .productId(request.getProductId())
                 .supplierId(request.getSupplierId())
+                .locationId(request.getLocationId())
                 .quantity(request.getQuantity())
                 .remainingQuantity(request.getQuantity())
                 .manufactureDate(request.getManufactureDate())
@@ -200,6 +230,12 @@ public class BatchServiceImpl implements BatchService {
 
         batch.setRemainingQuantity(newQty);
 
+        // ✅ mark batch as out of stock
+        if (newQty == 0) {
+
+            batch.setStatus("OUT_OF_STOCK");
+        }
+
         repository.save(batch);
 
         int totalStock = calculateTotalStock(batch.getProductId());
@@ -212,7 +248,11 @@ public class BatchServiceImpl implements BatchService {
 
             BatchEvent event = new BatchEvent();
             event.setEventType("STOCK_REDUCED");
-            event.setProductName(batch.getProductId()); // change if you have productName
+            ProductResponse product =
+                    productClient.getProduct(
+                            batch.getProductId()
+                    );
+            event.setProductName(product.getName());
             event.setBatchId(batch.getId());
             event.setExpiryDate(batch.getExpiryDate());
             event.setRemainingQuantity(newQty);
@@ -314,6 +354,7 @@ public class BatchServiceImpl implements BatchService {
                 .batchNumber(batch.getBatchNumber())
                 .productId(batch.getProductId())
                 .supplierId(batch.getSupplierId())
+                .locationId(batch.getLocationId())
                 .quantity(batch.getQuantity())
                 .remainingQuantity(batch.getRemainingQuantity())
                 .manufactureDate(batch.getManufactureDate())
@@ -331,8 +372,15 @@ public class BatchServiceImpl implements BatchService {
                 .sum();
     }
 
+
     @Transactional
     public List<BatchAllocationResponse> allocateBatch(AllocateBatchRequest request) {
+        if (request.getQuantity() <= 0) {
+
+            throw new RuntimeException(
+                    "Quantity must be greater than zero"
+            );
+        }
 
         int requiredQty = request.getQuantity();
 
@@ -374,6 +422,7 @@ public class BatchServiceImpl implements BatchService {
         if (requiredQty > 0) {
             throw new RuntimeException("Not enough stock available");
         }
+
 
         int totalStock = calculateTotalStock(
                 request.getProductId()

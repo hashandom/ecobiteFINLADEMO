@@ -1,10 +1,10 @@
 package com.ecobite.qr_service.service;
 
 import com.ecobite.qr_service.dto.request.GenerateQrRequest;
-import com.ecobite.qr_service.dto.response.QrResponse;
+import com.ecobite.qr_service.dto.response.ScanQrResponse;
 
 public interface QrService {
-    QrResponse generateQr(GenerateQrRequest request);
-    QrResponse getQrByBatchId(String batchId);
-    QrResponse scanQr(String qrCodeId);
+    ScanQrResponse generateQr(GenerateQrRequest request);
+    ScanQrResponse getQrByBatchId(String batchId);
+    ScanQrResponse scanQr(String qrCodeId);
 }

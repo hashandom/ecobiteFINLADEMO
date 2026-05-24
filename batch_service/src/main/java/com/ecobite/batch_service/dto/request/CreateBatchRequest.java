@@ -30,6 +30,9 @@ public class CreateBatchRequest {
     @NotNull(message = "Supplier ID is required")
     private Long supplierId;
 
+    @NotNull(message = "Location ID is required")
+    private Long locationId;
+
     @DecimalMin(value = "0.1", message = "Purchase price must be greater than 0")
     private BigDecimal purchasePrice;
 }

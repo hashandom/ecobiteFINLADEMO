@@ -1,6 +1,7 @@
 package com.ecobite.qr_service.exception;
 
 import com.ecobite.qr_service.dto.response.ApiResponse;
+import feign.FeignException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -13,6 +14,7 @@ import java.util.Map;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+    // Resource Not Found
     @ExceptionHandler(
             ResourceNotFoundException.class
     )
@@ -21,7 +23,9 @@ public class GlobalExceptionHandler {
             ResourceNotFoundException ex
     ){
 
-        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+        return ResponseEntity.status(
+                        HttpStatus.NOT_FOUND
+                )
                 .body(
                         new ApiResponse<>(
                                 404,
@@ -32,6 +36,7 @@ public class GlobalExceptionHandler {
                 );
     }
 
+    // Validation Errors
     @ExceptionHandler(
             MethodArgumentNotValidException.class
     )
@@ -40,7 +45,8 @@ public class GlobalExceptionHandler {
             MethodArgumentNotValidException ex
     ){
 
-        Map<String, String> errors = new HashMap<>();
+        Map<String, String> errors =
+                new HashMap<>();
 
         ex.getBindingResult()
                 .getFieldErrors()
@@ -51,7 +57,9 @@ public class GlobalExceptionHandler {
                         )
                 );
 
-        return ResponseEntity.badRequest()
+        return ResponseEntity.status(
+                        HttpStatus.BAD_REQUEST
+                )
                 .body(
                         new ApiResponse<>(
                                 400,
@@ -62,22 +70,7 @@ public class GlobalExceptionHandler {
                 );
     }
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ApiResponse<?>>
-    handleGlobal(Exception ex){
-
-        return ResponseEntity.status(
-                        HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(
-                        new ApiResponse<>(
-                                500,
-                                ex.getMessage(),
-                                null,
-                                LocalDateTime.now()
-                        )
-                );
-    }
-
+    // Invalid Request
     @ExceptionHandler(
             InvalidRequestException.class
     )
@@ -86,7 +79,9 @@ public class GlobalExceptionHandler {
             InvalidRequestException ex
     ){
 
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+        return ResponseEntity.status(
+                        HttpStatus.BAD_REQUEST
+                )
                 .body(
                         new ApiResponse<>(
                                 400,
@@ -97,6 +92,7 @@ public class GlobalExceptionHandler {
                 );
     }
 
+    // QR Generation Errors
     @ExceptionHandler(
             QrGenerationException.class
     )
@@ -112,6 +108,68 @@ public class GlobalExceptionHandler {
                         new ApiResponse<>(
                                 500,
                                 ex.getMessage(),
+                                null,
+                                LocalDateTime.now()
+                        )
+                );
+    }
+
+    // Feign Client Errors
+    @ExceptionHandler(
+            FeignException.class
+    )
+    public ResponseEntity<ApiResponse<?>>
+    handleFeignException(
+            FeignException ex
+    ){
+
+        String message =
+                "External service error";
+
+        HttpStatus status =
+                HttpStatus.INTERNAL_SERVER_ERROR;
+
+        if(ex.status() == 404){
+
+            message = "Batch not found";
+            status = HttpStatus.NOT_FOUND;
+
+        } else if(ex.status() == 503){
+
+            message =
+                    "Batch service unavailable";
+
+            status =
+                    HttpStatus.SERVICE_UNAVAILABLE;
+        }
+
+        return ResponseEntity.status(status)
+                .body(
+                        new ApiResponse<>(
+                                status.value(),
+                                message,
+                                null,
+                                LocalDateTime.now()
+                        )
+                );
+    }
+
+    // Global Exception Handler
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ApiResponse<?>>
+    handleGlobal(
+            Exception ex
+    ){
+
+        ex.printStackTrace();
+
+        return ResponseEntity.status(
+                        HttpStatus.INTERNAL_SERVER_ERROR
+                )
+                .body(
+                        new ApiResponse<>(
+                                500,
+                                "Unexpected server error",
                                 null,
                                 LocalDateTime.now()
                         )

@@ -2,16 +2,13 @@ package com.ecobite.qr_service.controller;
 
 import com.ecobite.qr_service.dto.request.GenerateQrRequest;
 import com.ecobite.qr_service.dto.response.ApiResponse;
-import com.ecobite.qr_service.dto.response.QrResponse;
+import com.ecobite.qr_service.dto.response.ScanQrResponse;
 import com.ecobite.qr_service.service.QrService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 
@@ -23,12 +20,12 @@ public class QrController {
     private QrService qrService;
 
     @PostMapping("/generate")
-    public ResponseEntity<ApiResponse<QrResponse>>
+    public ResponseEntity<ApiResponse<ScanQrResponse>>
     generateQr(
             @Valid @RequestBody GenerateQrRequest request
     ) {
 
-        QrResponse response =
+        ScanQrResponse response =
                 qrService.generateQr(request);
 
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -40,5 +37,21 @@ public class QrController {
                                 LocalDateTime.now()
                         )
                 );
+    }
+
+    @GetMapping("/scan/{qrCodeId}")
+    public ResponseEntity<ApiResponse<?>>
+    scanQr(
+            @PathVariable String qrCodeId
+    ){
+
+        return ResponseEntity.ok(
+                new ApiResponse<>(
+                        200,
+                        "QR scanned successfully",
+                        qrService.scanQr(qrCodeId),
+                        LocalDateTime.now()
+                )
+        );
     }
 }

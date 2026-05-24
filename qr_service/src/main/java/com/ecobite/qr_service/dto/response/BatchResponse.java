@@ -1,52 +1,32 @@
 package com.ecobite.qr_service.dto.response;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.time.LocalDate;
+
+@Data
+@NoArgsConstructor
 public class BatchResponse {
-    private String batchId;
+    private Long id;
+
+    private String batchNumber;
+
     private String productId;
+
+    private Long supplierId;
+
+    private Long locationId;
+
     private Integer quantity;
-    private String manufactureDate;
-    private String expiryDate;
 
-    public BatchResponse() {
-    }
+    private Integer remainingQuantity;
 
-    public String getBatchId() {
-        return batchId;
-    }
+    private LocalDate manufactureDate;
 
-    public void setBatchId(String batchId) {
-        this.batchId = batchId;
-    }
+    private LocalDate expiryDate;
 
-    public String getProductId() {
-        return productId;
-    }
+    private Double purchasePrice;
 
-    public void setProductId(String productId) {
-        this.productId = productId;
-    }
-
-    public Integer getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(Integer quantity) {
-        this.quantity = quantity;
-    }
-
-    public String getManufactureDate() {
-        return manufactureDate;
-    }
-
-    public void setManufactureDate(String manufactureDate) {
-        this.manufactureDate = manufactureDate;
-    }
-
-    public String getExpiryDate() {
-        return expiryDate;
-    }
-
-    public void setExpiryDate(String expiryDate) {
-        this.expiryDate = expiryDate;
-    }
+    private String status;
 }

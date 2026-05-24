@@ -81,4 +81,13 @@ public class LocationController {
 
         return ResponseEntity.ok(service.getLocationsByBatch(batchId));
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<LocationResponse> getLocationById(
+            @PathVariable Long id) {
+
+        return ResponseEntity.ok(
+                service.getLocationById(id)
+        );
+    }
 }

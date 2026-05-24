@@ -1,7 +1,5 @@
 package com.ecobite.batch_service.service;
 
-import com.ecobite.batch_service.dto.BatchRequestDTO;
-import com.ecobite.batch_service.dto.BatchResponseDTO;
 import com.ecobite.batch_service.dto.request.CreateBatchRequest;
 import com.ecobite.batch_service.dto.request.ReduceStockRequest;
 import com.ecobite.batch_service.dto.response.BatchResponse;

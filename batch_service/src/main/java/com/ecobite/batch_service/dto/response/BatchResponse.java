@@ -18,6 +18,8 @@ public class BatchResponse {
 
     private Long supplierId;
 
+    private Long locationId;
+
     private int quantity;
 
     private int remainingQuantity;

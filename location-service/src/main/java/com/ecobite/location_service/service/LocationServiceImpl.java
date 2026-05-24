@@ -313,6 +313,19 @@ public class LocationServiceImpl implements LocationService {
         return locationRepo.countDistinctWarehouses();
     }
 
+    @Override
+    public LocationResponse getLocationById(Long id) {
+
+        BatchLocation location =
+                locationRepo.findById(id)
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "Location not found"
+                                ));
+
+        return mapToResponse(location);
+    }
+
 
     private String generateCode(CreateLocationRequest request) {
 

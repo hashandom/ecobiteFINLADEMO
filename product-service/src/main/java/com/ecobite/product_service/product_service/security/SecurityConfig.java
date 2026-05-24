@@ -3,6 +3,7 @@ package com.ecobite.product_service.product_service.security;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -45,11 +46,33 @@ public class SecurityConfig {
 //                        .requestMatchers("/products/**")
 //                        .hasRole("ADMIN")
 //
-                         .requestMatchers("/products/**")
-                                .permitAll()
+                                // PUBLIC READ APIs
+                                .requestMatchers(
+                                        HttpMethod.GET,
+                                        "/products/*"
+                                ).permitAll()
 
-                        .anyRequest()
-                                .permitAll()
+                                .requestMatchers(
+                                        HttpMethod.GET,
+                                        "/products/search"
+                                ).permitAll()
+
+                                .requestMatchers(
+                                        HttpMethod.GET,
+                                        "/products/category/**"
+                                ).permitAll()
+
+                                // PROTECTED WRITE APIs
+                                .requestMatchers(
+                                        "/products/**"
+                                ).hasAnyRole(
+                                        "ADMIN",
+                                        "MANAGER",
+                                        "STAFF"
+                                )
+
+                                .anyRequest()
+                                .authenticated()
                 );
 
         return http.build();

@@ -103,7 +103,7 @@ public class QrServiceImpl implements QrService {
 
             // Generate QR scan URL
             String qrData =
-                    "http://localhost:8080/qr/scan/"
+                    "http://192.168.1.2:8086/qr/scan/"
                             + qrCodeId;
 
             String filePath =
@@ -201,28 +201,36 @@ public class QrServiceImpl implements QrService {
                         );
 
         // Get batch details
+        System.out.println("Fetching Batch...");
         BatchResponse batch =
                 batchServiceClient.getBatch(
                         qrCode.getBatchId()
                 );
+        System.out.println("Batch fetched successfully");
 
         // Get product details
+        System.out.println("Fetching Product...");
         ProductResponse product =
                 productClient.getProduct(
                         batch.getProductId()
                 );
+        System.out.println("Product fetched successfully");
 
         // Get supplier details
+        System.out.println("Fetching Supplier...");
         SupplierResponse supplier =
                 supplierClient.getSupplier(
                         batch.getSupplierId()
                 );
+        System.out.println("Supplier fetched successfully");
 
         // Get location details
+        System.out.println("Fetching Location...");
         LocationResponse location =
                 locationClient.getLocation(
                         batch.getLocationId()
                 );
+        System.out.println("Location fetched successfully");
 
         // Build response
         ScanQrResponse response =

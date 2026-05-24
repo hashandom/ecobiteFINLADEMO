@@ -8,49 +8,49 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 public class SecurityConfig {
-
     private final JwtValidationFilter jwtValidationFilter;
 
-    public SecurityConfig(JwtValidationFilter jwtValidationFilter) {
+    public SecurityConfig(
+            JwtValidationFilter jwtValidationFilter
+    ) {
         this.jwtValidationFilter = jwtValidationFilter;
     }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(
+            HttpSecurity http
+    ) throws Exception {
 
         http
                 .csrf(csrf -> csrf.disable())
-                .addFilterBefore(jwtValidationFilter,
-                        UsernamePasswordAuthenticationFilter.class)
+
                 .authorizeHttpRequests(auth -> auth
 
-//                        .requestMatchers("/products").hasAnyRole("ADMIN","MANAGER","STAFF")
-//
-//                        .requestMatchers("/products/{id}")
-//                        .hasAnyRole("ADMIN","MANAGER","STAFF")
-//
-//                        .requestMatchers("/products/search")
-//                        .hasAnyRole("ADMIN","MANAGER","STAFF")
-//
-//                        .requestMatchers("/products/category/**")
-//                        .hasAnyRole("ADMIN","MANAGER","STAFF")
-//
-//                        .requestMatchers("/products/low-stock")
-//                        .hasAnyRole("ADMIN","MANAGER")
-//
-//                        .requestMatchers("/products/update-stock/**")
-//                        .hasAnyRole("ADMIN","MANAGER")
-//
-//                        .requestMatchers("/products/**")
-//                        .hasRole("ADMIN")
-//
-                         .requestMatchers("/products/**")
-                                .hasAnyRole("ADMIN","MANAGER","STAFF")
+                        // PUBLIC QR SCAN
+                        .requestMatchers(
+                                "/qr/scan/**"
+                        ).permitAll()
 
+                        // SECURED QR GENERATION
+                        .requestMatchers(
+                                "/qr/generate"
+                        ).hasAnyRole(
+                                "ADMIN",
+                                "MANAGER",
+                                "STAFF"
+                        )
+
+                        // OTHER APIs
                         .anyRequest()
                         .authenticated()
+                )
+
+                .addFilterBefore(
+                        jwtValidationFilter,
+                        UsernamePasswordAuthenticationFilter.class
                 );
 
         return http.build();
     }
+
 }

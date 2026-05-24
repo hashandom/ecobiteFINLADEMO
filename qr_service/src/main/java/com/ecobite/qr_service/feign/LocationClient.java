@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 @FeignClient(name = "location-service", configuration = FeignConfig.class)
 public interface LocationClient {
-    @GetMapping("/locations/{locationId}")
+    @GetMapping("/location/{locationId}")
     LocationResponse getLocation(
             @PathVariable Long locationId
     );

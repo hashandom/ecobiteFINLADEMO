@@ -25,7 +25,7 @@ public class SupplierServiceImpl implements SupplierService {
     private final SupplierRepository supplierRepository;
     private final SupplierProductRepository supplierProductRepository;
     private final ProductClient productClient;
-
+    private final SupplierEventProducer supplierEventProducer;
 
 
     // =========================
@@ -78,7 +78,12 @@ public class SupplierServiceImpl implements SupplierService {
 
         supplier.setRating(0.0);
         supplierRepository.save(supplier);
+
+// SEND KAFKA EVENT
+        supplierEventProducer
+                .sendSupplierCreatedEvent(supplier);
         return mapToResponse(supplier);
+
     }
 
     // =========================

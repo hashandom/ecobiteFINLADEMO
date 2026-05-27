@@ -6,5 +6,5 @@ import lombok.Data;
 public class SupplierEvent {
     private String eventType; // CREATED
     private String supplierName;
-    private String supplierId;
+    private Long supplierId;
 }

@@ -2,7 +2,9 @@ package com.ecobite.batch_service.scheduler;
 
 import com.ecobite.batch_service.KafKaEventProducer.BatchEventProducer;
 import com.ecobite.batch_service.dto.Kafkaevent.BatchEvent;
+import com.ecobite.batch_service.dto.response.ProductResponse;
 import com.ecobite.batch_service.entity.Batch;
+import com.ecobite.batch_service.feign.ProductClient;
 import com.ecobite.batch_service.repository.BatchRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +20,7 @@ import java.util.List;
 public class BatchExpiryAlertScheduler {
     private final BatchRepository batchRepository;
     private final BatchEventProducer producer;
+    private final ProductClient productClient;
 
     //@Scheduled(cron = "0 0 8 * * ?") // every day at 8 AM
     @Scheduled(fixedRate = 10000) // every day at 8 AM
@@ -35,10 +38,13 @@ public class BatchExpiryAlertScheduler {
                         );
 
         for (Batch batch : expiringBatches) {
+            ProductResponse product =
+                    productClient.getProduct(batch.getProductId());
+
 
             BatchEvent event = new BatchEvent(
                     "BATCH_EXPIRING",
-                    batch.getBatchNumber(),
+                    product.getName(),
                     batch.getId(),
                     batch.getExpiryDate(),
                     batch.getRemainingQuantity()

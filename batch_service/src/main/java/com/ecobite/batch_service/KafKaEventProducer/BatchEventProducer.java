@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class BatchEventProducer {
-    private final KafkaTemplate<String, BatchEvent> kafkaTemplate;
+    private final KafkaTemplate<String, Object> kafkaTemplate;
 
     public void sendEvent(BatchEvent event) {
         kafkaTemplate.send("batch-events", event);

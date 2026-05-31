@@ -1,34 +1,28 @@
 package com.ecobite.dashboard_service.kafka;
+import com.ecobite.dashboard_service.dto.event.DashboardEvent;
+import com.ecobite.dashboard_service.websocket.DashboardSocketPublisher;
+import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class DashboardEventConsumer {
+    private final DashboardSocketPublisher publisher;
+
     @KafkaListener(
-            topics = "inventory-updates",
+            topics = "dashboard-events",
             groupId = "dashboard-group"
     )
-    public void consumeInventoryUpdate(
-            String message
-    ) {
+    public void consume(DashboardEvent event) {
 
         System.out.println(
-                "Inventory Event Received: "
-                        + message
+                "Dashboard Event Received: "
+                        + event.getMessage()
         );
-    }
 
-    @KafkaListener(
-            topics = "reorder-alerts",
-            groupId = "dashboard-group"
-    )
-    public void consumeReorderAlert(
-            String message
-    ) {
-
-        System.out.println(
-                "Reorder Event Received: "
-                        + message
+        publisher.publishUpdate(
+                event.getMessage()
         );
     }
 }

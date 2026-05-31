@@ -4,28 +4,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.Map;
+
 @Service
 @RequiredArgsConstructor
 public class DashboardEventProducer {
     private final KafkaTemplate<String, String> kafkaTemplate;
 
-    public void publishInventoryUpdate(
-            String message
-    ) {
-
-        kafkaTemplate.send(
-                "inventory-updates",
-                message
-        );
-    }
-
-    public void publishReorderAlert(
-            String message
-    ) {
-
-        kafkaTemplate.send(
-                "reorder-alerts",
-                message
-        );
+    public void sendLowStockEvent(String message) {
+        kafkaTemplate.send("dashboard-events", message);
     }
 }

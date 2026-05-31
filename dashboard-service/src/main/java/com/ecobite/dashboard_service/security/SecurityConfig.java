@@ -44,11 +44,18 @@ public class SecurityConfig {
 //                        .requestMatchers("/products/**")
 //                        .hasRole("ADMIN")
 //
-                         .requestMatchers("/products/**")
+                                // Allow WebSocket
+                                .requestMatchers("/ws/**").permitAll()
+
+                                // Allow actuator
+                                .requestMatchers("/actuator/**").permitAll()
+
+                                // Product APIs
+                                .requestMatchers("/products/**")
                                 .hasAnyRole("ADMIN","MANAGER","STAFF")
 
-                        .anyRequest()
-                        .authenticated()
+                                .anyRequest()
+                                .authenticated()
                 );
 
         return http.build();

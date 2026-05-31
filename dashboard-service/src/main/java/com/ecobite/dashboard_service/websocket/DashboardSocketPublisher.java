@@ -5,31 +5,14 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class DashboardSocketPublisher {
-    public void publishDashboardUpdate(
-            Object payload
-    ) {
+    private final SimpMessagingTemplate messagingTemplate;
 
-        System.out.println(
-                "Dashboard Update: " + payload
-        );
-    }
-
-    public void publishInventoryUpdate(
-            Object payload
-    ) {
-
-        System.out.println(
-                "Inventory Update: " + payload
-        );
-    }
-
-    public void publishReorderUpdate(
-            Object payload
-    ) {
-
-        System.out.println(
-                "Reorder Update: " + payload
+    public void publishUpdate(String message) {
+        messagingTemplate.convertAndSend(
+                "/topic/dashboard",
+                message
         );
     }
 

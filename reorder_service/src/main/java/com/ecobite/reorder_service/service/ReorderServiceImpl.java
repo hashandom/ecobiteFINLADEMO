@@ -136,6 +136,6 @@ public class ReorderServiceImpl implements ReorderService {
 
     @Override
     public Long getPendingReordersCount() {
-        return repository.countByStatus("PENDING");
+        return repository.countByStatus("CREATED");
     }
 }

@@ -26,4 +26,9 @@ public class NotificationController {
     public Long getUnreadCount() {
         return repository.countByIsReadFalse();
     }
+
+    @GetMapping("/count")
+    public Long getCount() {
+        return repository.count();
+    }
 }

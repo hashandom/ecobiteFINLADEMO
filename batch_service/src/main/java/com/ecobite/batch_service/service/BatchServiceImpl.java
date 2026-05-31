@@ -2,6 +2,7 @@ package com.ecobite.batch_service.service;
 
 
 import com.ecobite.batch_service.KafKaEventProducer.BatchEventProducer;
+import com.ecobite.batch_service.KafKaEventProducer.DashboardEventProducer;
 import com.ecobite.batch_service.dto.Kafkaevent.BatchEvent;
 import com.ecobite.batch_service.dto.request.AllocateBatchRequest;
 import com.ecobite.batch_service.dto.request.CreateBatchRequest;
@@ -33,6 +34,7 @@ public class BatchServiceImpl implements BatchService {
     private final BatchEventProducer producer;
     private final SupplierClient supplierClient;
     private final LocationClient locationClient;
+    private final DashboardEventProducer   dashboardEventProducer;
 
     @Override
     @Transactional
@@ -258,6 +260,10 @@ public class BatchServiceImpl implements BatchService {
             event.setRemainingQuantity(newQty);
 
             producer.sendEvent(event);
+
+            dashboardEventProducer.sendLowStockAlert(
+                    product.getName()
+            );
 
             System.out.println("Stock reduced alert sent for batch: " + batch.getId());
         }

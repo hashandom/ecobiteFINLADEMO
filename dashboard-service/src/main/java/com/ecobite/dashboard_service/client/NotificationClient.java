@@ -8,4 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 public interface NotificationClient {
     @GetMapping("/notifications/unread/count")
     Long getUnreadCount();
+
+    @GetMapping("/notifications/count")
+    Long getTotalNotifications();
 }

@@ -25,7 +25,7 @@ public class JwtGatewayFilter implements GlobalFilter {
         String path = exchange.getRequest().getURI().getPath();
         System.out.println("Gateway Request Path: " + path);
 
-        // ✅ Allow public endpoints
+        // Allow public endpoints
         if (path.startsWith("/auth/login") ||
                 path.startsWith("/auth/register") ||
                 path.startsWith("/auth/forgot-password") ||
@@ -40,7 +40,7 @@ public class JwtGatewayFilter implements GlobalFilter {
 
         System.out.println("Authorization Header at Gateway: " + header);
 
-        // ❌ Missing header
+        //  Missing header
         if (header == null || !header.startsWith("Bearer ")) {
             return handleUnauthorized(exchange, "Missing Authorization Header");
         }
@@ -48,24 +48,24 @@ public class JwtGatewayFilter implements GlobalFilter {
         String token = header.substring(7);
         System.out.println("Gateway Token: " + token);
 
-        // 🔥 Check blacklist
+        //  Check blacklist
         if (blacklistRepo.existsByToken(token)) {
             return handleUnauthorized(exchange, "Token is logged out");
         }
 
-        // 🔥 Validate JWT
+        // Validate JWT
         try {
             String username = jwtService.extractUsername(token);
-            System.out.println("✅ Valid token for user: " + username);
+            System.out.println("Valid token for user: " + username);
         } catch (Exception e) {
             return handleUnauthorized(exchange, "Invalid or expired token");
         }
 
-        // ✅ Forward request
+        //  Forward request
         return chain.filter(exchange);
     }
 
-    // ✅ THIS MUST BE OUTSIDE filter()
+    // THIS MUST BE OUTSIDE filter()
     private Mono<Void> handleUnauthorized(ServerWebExchange exchange, String message) {
 
         exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);

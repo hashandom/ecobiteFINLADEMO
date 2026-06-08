@@ -65,6 +65,16 @@ public class ProductServiceImpl implements ProductService {
 
         repository.save(product);
 
+        ProductEvent event = new ProductEvent();
+
+        event.setEventType("PRODUCT_CREATED");
+        event.setProductId(product.getId());
+        event.setProductName(product.getName());
+        event.setStock(product.getStock());
+        event.setReorderLevel(product.getReorderLevel());
+
+        producer.sendEvent(event);
+
         return mapToResponse(product);
     }
 

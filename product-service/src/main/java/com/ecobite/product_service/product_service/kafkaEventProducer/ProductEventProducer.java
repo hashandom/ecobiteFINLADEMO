@@ -13,6 +13,6 @@ public class ProductEventProducer {
 
     public void sendEvent(ProductEvent event) {
         kafkaTemplate.send("product-events", event);
-        System.out.println("✅ Product event sent: " + event);
+        System.out.println( "Product event sent: " + event);
     }
 }

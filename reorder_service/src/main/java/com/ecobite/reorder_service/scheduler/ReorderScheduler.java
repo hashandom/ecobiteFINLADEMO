@@ -60,7 +60,13 @@ public class ReorderScheduler {
                     System.out.println("Reorder created for: " + product.getId());
 
                 } catch (Exception e) {
-                    System.out.println("Skipped product: " + product.getId());
+
+                    System.out.println(
+                            "Skipped product: "
+                                    + product.getId()
+                                    + " Reason: "
+                                    + e.getMessage()
+                    );
                 }
             }
         }

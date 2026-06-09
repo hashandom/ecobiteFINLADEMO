@@ -45,6 +45,15 @@ public class BatchServiceImpl implements BatchService {
             );
         }
 
+        //Prevent expired batch creation
+        if (!request.getExpiryDate()
+                .isAfter(LocalDate.now())) {
+
+            throw new RuntimeException(
+                    "Expiry date must be a future date"
+            );
+        }
+
         if (repository.existsByBatchNumber(request.getBatchNumber())) {
             throw new RuntimeException(
                     "Batch number already exists"

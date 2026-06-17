@@ -7,11 +7,13 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.beans.factory.annotation.Value;
 
 @Configuration
 public class FeignConfig {
 
-    private static final String SYSTEM_TOKEN = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzdXBlcmFkbWluIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzgxMDg0MTQ2LCJleHAiOjE3ODExNzA1NDZ9.OEu175lZfXmsUnn-9MKZ_rhVPD_HPlhkChWWIwYq0WM";
+    @Value("${app.system-token}")
+    private String systemToken;
 
     @Bean
     public RequestInterceptor requestInterceptor() {
@@ -36,7 +38,7 @@ public class FeignConfig {
                 }
 
                 // Case 2: Scheduler (no request context)
-                requestTemplate.header("Authorization", "Bearer " + SYSTEM_TOKEN);
+                requestTemplate.header("Authorization", "Bearer " + systemToken);
             }
         };
     }

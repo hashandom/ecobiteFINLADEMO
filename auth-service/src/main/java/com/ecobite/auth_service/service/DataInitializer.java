@@ -19,7 +19,8 @@ public class DataInitializer {
     @PostConstruct
     public void initAdmin() {
 
-        if(!repo.existsByUsername("admin")){
+        if (!repo.existsByUsername("superadmin")
+                && !repo.existsByEmail("admin@test.com")) {
 
             User user = new User();
 

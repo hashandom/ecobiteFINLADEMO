@@ -176,3 +176,6 @@ volumes:
   recall_mysql_data:
   notification_mysql_data:
   dashboard_mysql_data:
+
+
+# now going to add all DBs to single DB

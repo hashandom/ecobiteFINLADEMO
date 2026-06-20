@@ -1,6 +1,7 @@
 package com.ecobite.reorder_service.service;
 
 import com.ecobite.reorder_service.DTOs.request.LoginRequest;
+import com.ecobite.reorder_service.DTOs.response.ApiResponse;
 import com.ecobite.reorder_service.feign.AuthClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -23,18 +24,17 @@ public class SystemTokenService {
 
     public String getToken() {
 
-        if(token == null) {
+        if (token == null) {
 
-            LoginRequest request =
-                    new LoginRequest();
-
+            LoginRequest request = new LoginRequest();
             request.setUsername(username);
             request.setPassword(password);
 
-            token =
-                    authClient
-                            .login(request)
-                            .getToken();
+            ApiResponse response = authClient.login(request);
+
+            token = response.getData().getToken();
+
+            System.out.println("TOKEN GENERATED: " + token);
         }
 
         return token;

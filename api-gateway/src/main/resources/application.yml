@@ -63,6 +63,16 @@ spring:
           predicates:
             - Path=/dashboard/**
 
+        - id: analytics-service
+          uri: lb://dashboard-service
+          predicates:
+            - Path=/analytics/**
+
+        - id: realtime-service
+          uri: lb://dashboard-service
+          predicates:
+            - Path=/realtime/**
+
 management:
   endpoints:
     web:

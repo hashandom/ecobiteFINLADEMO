@@ -35,6 +35,13 @@ services:
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
 
+  redis:
+    image: redis:7
+    container_name: redis
+    restart: always
+    ports:
+      - "6379:6379"
+
   discovery-server:
     build: ./discovery-server
     container_name: discovery-server
@@ -142,6 +149,7 @@ services:
       - product-service
       - supplier-service
       - batch-service
+      - redis
 
   api-gateway:
     build: ./api-gateway

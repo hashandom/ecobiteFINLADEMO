@@ -36,5 +36,22 @@ public class DataInitializer {
 
             System.out.println("✅ Default ADMIN user created");
         }
+
+        // Create System User
+        if (!repo.existsByUsername("system")) {
+
+            User systemUser = new User();
+            systemUser.setUsername("system");
+            systemUser.setEmail("system@ecobite.com");
+            systemUser.setPassword(passwordEncoder.encode("system123"));
+            systemUser.setRole(Role.ADMIN);
+            systemUser.setStatus("ACTIVE");
+            systemUser.setLocked(false);
+            systemUser.setFailedAttempts(0);
+
+            repo.save(systemUser);
+
+            System.out.println("✅ System user created");
+        }
     }
 }

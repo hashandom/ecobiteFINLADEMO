@@ -1,0 +1,157 @@
+services:
+
+  mysql:
+    image: mysql:8
+    container_name: ecobite-mysql
+    restart: always
+    ports:
+      - "4306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.5.0
+    container_name: zookeeper
+    restart: always
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+    ports:
+      - "2181:2181"
+
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    container_name: kafka
+    restart: always
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+
+  discovery-server:
+    build: ./discovery-server
+    container_name: discovery-server
+    restart: always
+    ports:
+      - "8761:8761"
+
+  config-server:
+    build: ./config-server
+    container_name: config-server
+    restart: always
+    ports:
+      - "8888:8888"
+    depends_on:
+      - discovery-server
+
+  auth-service:
+    build: ./auth-service
+    container_name: auth-service
+    restart: always
+    ports:
+      - "8081:8081"
+    depends_on:
+      - mysql
+      - discovery-server
+      - config-server
+
+  product-service:
+    build: ./product-service
+    container_name: product-service
+    restart: always
+    ports:
+      - "8082:8082"
+    depends_on:
+      - mysql
+      - kafka
+
+  batch-service:
+    build: ./batch_service
+    container_name: batch-service
+    restart: always
+    ports:
+      - "8083:8083"
+    depends_on:
+      - mysql
+      - kafka
+
+  supplier-service:
+    build: ./supplier_service
+    container_name: supplier-service
+    restart: always
+    ports:
+      - "8084:8084"
+    depends_on:
+      - mysql
+      - kafka
+
+  reorder-service:
+    build: ./reorder_service
+    container_name: reorder-service
+    restart: always
+    ports:
+      - "8085:8085"
+    environment:
+      SYSTEM_USERNAME: system
+      SYSTEM_PASSWORD: system123
+    depends_on:
+      - mysql
+      - kafka
+
+  qr-service:
+    build: ./qr_service
+    container_name: qr-service
+    restart: always
+    ports:
+      - "8086:8086"
+    depends_on:
+      - mysql
+
+  location-service:
+    build: ./location-service
+    container_name: location-service
+    restart: always
+    ports:
+      - "8088:8088"
+    depends_on:
+      - mysql
+
+  notification-service:
+    build: ./notification-service
+    container_name: notification-service
+    restart: always
+    ports:
+      - "8090:8090"
+    depends_on:
+      - kafka
+
+  dashboard-service:
+    build: ./dashboard-service
+    container_name: dashboard-service
+    restart: always
+    ports:
+      - "8091:8091"
+    depends_on:
+      - product-service
+      - supplier-service
+      - batch-service
+
+  api-gateway:
+    build: ./api-gateway
+    container_name: api-gateway
+    restart: always
+    ports:
+      - "8080:8080"
+    depends_on:
+      - auth-service
+      - discovery-server
+
+volumes:
+  mysql_data:

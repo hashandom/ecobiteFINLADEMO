@@ -1,5 +1,6 @@
 package com.ecobite.reorder_service.feign;
 
+import com.ecobite.reorder_service.service.SystemTokenService;
 import feign.RequestInterceptor;
 import feign.RequestTemplate;
 import jakarta.servlet.http.HttpServletRequest;
@@ -12,8 +13,12 @@ import org.springframework.beans.factory.annotation.Value;
 @Configuration
 public class FeignConfig {
 
-    @Value("${app.system-token}")
-    private String systemToken;
+    private final SystemTokenService tokenService;
+
+
+    public FeignConfig(SystemTokenService tokenService) {
+        this.tokenService = tokenService;
+    }
 
     @Bean
     public RequestInterceptor requestInterceptor() {
@@ -38,7 +43,10 @@ public class FeignConfig {
                 }
 
                 // Case 2: Scheduler (no request context)
-                requestTemplate.header("Authorization", "Bearer " + systemToken);
+                requestTemplate.header(
+                        "Authorization",
+                        "Bearer " + tokenService.getToken()
+                );
             }
         };
     }

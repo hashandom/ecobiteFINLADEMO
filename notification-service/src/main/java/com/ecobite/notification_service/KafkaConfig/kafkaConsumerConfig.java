@@ -26,7 +26,7 @@ public class kafkaConsumerConfig {
     private Map<String, Object> baseConfig() {
         Map<String, Object> config = new HashMap<>();
 
-        config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+        config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG,  "kafka:9092");
         config.put(ConsumerConfig.GROUP_ID_CONFIG, "notification-group");
 
         config.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");

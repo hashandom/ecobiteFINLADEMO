@@ -25,6 +25,11 @@ public class JwtGatewayFilter implements GlobalFilter {
         String path = exchange.getRequest().getURI().getPath();
         System.out.println("Gateway Request Path: " + path);
 
+        // Allow CORS preflight requests
+        if (exchange.getRequest().getMethod().name().equals("OPTIONS")) {
+            return chain.filter(exchange);
+        }
+
         // Allow public endpoints
         if (path.startsWith("/auth/login") ||
                 path.startsWith("/auth/register") ||

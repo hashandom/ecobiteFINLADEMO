@@ -3,6 +3,7 @@ package com.ecobite.location_service.controller;
 import com.ecobite.location_service.DTO.*;
 import com.ecobite.location_service.service.LocationService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
 
@@ -18,70 +19,89 @@ public class LocationController {
         this.service = service;
     }
 
-    //Create Location
+
+    @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")
     @PostMapping
     public ResponseEntity<LocationResponse> create(
             @Valid @RequestBody CreateLocationRequest request) {
 
-        return ResponseEntity.ok(service.createLocation(request));
+        return ResponseEntity.ok(
+                service.createLocation(request)
+        );
     }
 
-    //Assign Batch
+    @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")
     @PostMapping("/assign")
     public ResponseEntity<Map<String, String>> assign(
             @Valid @RequestBody AssignBatchRequest request) {
 
         service.assignBatch(request);
 
-        return ResponseEntity.ok(Map.of(
-                "message", "Batch assigned successfully"
-        ));
+        return ResponseEntity.ok(
+                Map.of(
+                        "message",
+                        "Batch assigned successfully"
+                )
+        );
     }
 
-    // Move Batch
+    @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")
     @PostMapping("/move")
     public ResponseEntity<Map<String, Object>> move(
             @Valid @RequestBody MoveBatchRequest request) {
 
         service.moveBatch(request);
 
-        return ResponseEntity.ok(Map.of(
-                "message", "Batch moved successfully",
-                "batchId", request.getBatchId(),
-                "fromLocationId", request.getFromLocationId(),
-                "toLocationId", request.getToLocationId(),
-                "quantity", request.getQuantity()
-        ));
+        return ResponseEntity.ok(
+                Map.of(
+                        "message", "Batch moved successfully",
+                        "batchId", request.getBatchId(),
+                        "fromLocationId", request.getFromLocationId(),
+                        "toLocationId", request.getToLocationId(),
+                        "quantity", request.getQuantity()
+                )
+        );
     }
 
-    //  Get All Locations
+    // ================= READ OPERATIONS =================
+
+    @PreAuthorize("hasAnyRole('ADMIN','MANAGER','STAFF')")
     @GetMapping
     public ResponseEntity<List<LocationResponse>> getAllLocations() {
-        return ResponseEntity.ok(service.getAllLocations());
+        return ResponseEntity.ok(
+                service.getAllLocations()
+        );
     }
 
-    // Warehouse Count for Dashboard
+    @PreAuthorize("hasAnyRole('ADMIN','MANAGER','STAFF')")
     @GetMapping("/warehouses/count")
     public Long getWarehouseCount() {
         return service.getWarehouseCount();
     }
 
-    //  Get Inventory by Location
+    @PreAuthorize("hasAnyRole('ADMIN','MANAGER','STAFF')")
     @GetMapping("/{locationId}/inventory")
-    public ResponseEntity<List<InventoryLocationResponse>> getInventoryByLocation(
+    public ResponseEntity<List<InventoryLocationResponse>>
+    getInventoryByLocation(
             @PathVariable Long locationId) {
 
-        return ResponseEntity.ok(service.getInventoryByLocation(locationId));
+        return ResponseEntity.ok(
+                service.getInventoryByLocation(locationId)
+        );
     }
 
-    //  Get Locations by Batch (for recall-service)
+    @PreAuthorize("hasAnyRole('ADMIN','MANAGER','STAFF')")
     @GetMapping("/batch/{batchId}")
-    public ResponseEntity<List<InventoryLocationResponse>> getLocationsByBatch(
+    public ResponseEntity<List<InventoryLocationResponse>>
+    getLocationsByBatch(
             @PathVariable Long batchId) {
 
-        return ResponseEntity.ok(service.getLocationsByBatch(batchId));
+        return ResponseEntity.ok(
+                service.getLocationsByBatch(batchId)
+        );
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN','MANAGER','STAFF')")
     @GetMapping("/{id}")
     public ResponseEntity<LocationResponse> getLocationById(
             @PathVariable Long id) {

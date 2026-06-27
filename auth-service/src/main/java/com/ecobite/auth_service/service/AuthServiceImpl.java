@@ -2,6 +2,7 @@ package com.ecobite.auth_service.service;
 
 import com.ecobite.auth_service.dto.request.*;
 import com.ecobite.auth_service.dto.response.AuthResponse;
+import com.ecobite.auth_service.dto.response.UserResponse;
 import com.ecobite.auth_service.entity.BlackListedToken;
 import com.ecobite.auth_service.entity.User;
 import com.ecobite.auth_service.repository.BlackListedTokenRepository;
@@ -13,6 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -171,5 +173,64 @@ public class AuthServiceImpl implements AuthService{
         blackListedTokenRepository.save(blacklistedToken);
 
         return "Logout successful";
+    }
+
+    public List<UserResponse> getAllUsers() {
+
+        return repository.findAll()
+                .stream()
+                .map(user -> UserResponse.builder()
+                        .id(user.getId())
+                        .username(user.getUsername())
+                        .email(user.getEmail())
+                        .role(user.getRole())
+                        .status(user.getStatus())
+                        .locked(user.isLocked())
+                        .build())
+                .toList();
+    }
+
+    public UserResponse getUserById(Long id){
+
+        User user = repository.findById(id)
+                .orElseThrow(() ->
+                        new RuntimeException("User not found"));
+
+        return UserResponse.builder()
+                .id(user.getId())
+                .username(user.getUsername())
+                .email(user.getEmail())
+                .role(user.getRole())
+                .status(user.getStatus())
+                .locked(user.isLocked())
+                .build();
+    }
+
+    public String updateUser(Long id,
+                             UpdateUserRequest request){
+
+        User user = repository.findById(id)
+                .orElseThrow(() ->
+                        new RuntimeException("User not found"));
+
+        user.setEmail(request.getEmail());
+        user.setRole(request.getRole());
+        user.setStatus(request.getStatus());
+        user.setLocked(request.isLocked());
+
+        repository.save(user);
+
+        return "User updated successfully";
+    }
+
+    public String deleteUser(Long id){
+
+        User user = repository.findById(id)
+                .orElseThrow(() ->
+                        new RuntimeException("User not found"));
+
+        repository.delete(user);
+
+        return "User deleted successfully";
     }
 }

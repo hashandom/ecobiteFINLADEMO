@@ -16,6 +16,54 @@ public class AuthController {
     private AuthService service;
 
     @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")
+    @GetMapping("/users")
+    public ApiResponse getAllUsers(){
+
+        return new ApiResponse(
+                true,
+                "Users retrieved successfully",
+                service.getAllUsers()
+        );
+    }
+
+    @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")
+    @GetMapping("/users/{id}")
+    public ApiResponse getUserById(
+            @PathVariable Long id){
+
+        return new ApiResponse(
+                true,
+                "User retrieved successfully",
+                service.getUserById(id)
+        );
+    }
+
+    @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")
+    @PutMapping("/users/{id}")
+    public ApiResponse updateUser(
+            @PathVariable Long id,
+            @RequestBody UpdateUserRequest request){
+
+        return new ApiResponse(
+                true,
+                service.updateUser(id, request),
+                null
+        );
+    }
+
+    @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")
+    @DeleteMapping("/users/{id}")
+    public ApiResponse deleteUser(
+            @PathVariable Long id){
+
+        return new ApiResponse(
+                true,
+                service.deleteUser(id),
+                null
+        );
+    }
+
+    @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")
     @PostMapping("/register")
     public ApiResponse register(@RequestBody RegisterRequest request){
         return new ApiResponse(true,
@@ -39,7 +87,7 @@ public class AuthController {
                 null);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")
     @PutMapping("/unlock/{username}")
     public ApiResponse unlockAccount(@PathVariable String username){
         service.unlockAccount(username);

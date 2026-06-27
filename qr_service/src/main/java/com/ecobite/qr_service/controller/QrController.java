@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -19,6 +20,7 @@ public class QrController {
     @Autowired
     private QrService qrService;
 
+    @PreAuthorize("hasAnyRole('ADMIN','MANAGER','STAFF')")
     @PostMapping("/generate")
     public ResponseEntity<ApiResponse<ScanQrResponse>>
     generateQr(
@@ -39,6 +41,7 @@ public class QrController {
                 );
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN','MANAGER','STAFF')")
     @GetMapping("/scan/{qrCodeId}")
     public ResponseEntity<ApiResponse<?>>
     scanQr(

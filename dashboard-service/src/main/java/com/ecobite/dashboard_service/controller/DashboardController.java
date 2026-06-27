@@ -6,6 +6,7 @@ import com.ecobite.dashboard_service.service.DashboardService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -15,6 +16,7 @@ public class DashboardController {
 
     private final DashboardService dashboardService;
 
+    @PreAuthorize("hasAnyRole('ADMIN','MANAGER','STAFF')")
     @GetMapping("/overview")
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse<DashboardOverviewResponse> getDashboardOverview() {

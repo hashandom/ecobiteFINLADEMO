@@ -3,11 +3,15 @@ package com.ecobite.reorder_service.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
+@EnableWebSecurity
+@EnableMethodSecurity
 public class SecurityConfig {
 
     private final JwtValidationFilter jwtValidationFilter;
@@ -21,35 +25,14 @@ public class SecurityConfig {
 
         http
                 .csrf(csrf -> csrf.disable())
-                .addFilterBefore(jwtValidationFilter,
-                        UsernamePasswordAuthenticationFilter.class)
-                .authorizeHttpRequests(auth -> auth
 
-//                        .requestMatchers("/products").hasAnyRole("ADMIN","MANAGER","STAFF")
-//
-//                        .requestMatchers("/products/{id}")
-//                        .hasAnyRole("ADMIN","MANAGER","STAFF")
-//
-//                        .requestMatchers("/products/search")
-//                        .hasAnyRole("ADMIN","MANAGER","STAFF")
-//
-//                        .requestMatchers("/products/category/**")
-//                        .hasAnyRole("ADMIN","MANAGER","STAFF")
-//
-//                        .requestMatchers("/products/low-stock")
-//                        .hasAnyRole("ADMIN","MANAGER")
-//
-//                        .requestMatchers("/products/update-stock/**")
-//                        .hasAnyRole("ADMIN","MANAGER")
-//
-//                        .requestMatchers("/products/**")
-//                        .hasRole("ADMIN")
-//
-                         .requestMatchers("/products/**")
-                                .hasAnyRole("ADMIN","MANAGER","STAFF")
+                .addFilterBefore(
+                        jwtValidationFilter,
+                        UsernamePasswordAuthenticationFilter.class
+                )
 
-                        .anyRequest()
-                        .authenticated()
+                .authorizeHttpRequests(auth ->
+                        auth.anyRequest().authenticated()
                 );
 
         return http.build();

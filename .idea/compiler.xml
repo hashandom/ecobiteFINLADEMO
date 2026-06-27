@@ -15,6 +15,7 @@
         <module name="api-gateway" />
         <module name="product-service" />
         <module name="supplier_service" />
+        <module name="notification-service" />
       </profile>
       <profile name="Annotation profile for qr_service" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
@@ -35,7 +36,6 @@
         </processorPath>
         <module name="reorder_service" />
         <module name="auth-service" />
-        <module name="notification-service" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>

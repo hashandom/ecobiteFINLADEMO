@@ -13,3 +13,5 @@ public class QrServiceApplication {
 	}
 
 }
+
+/*Before RBAC*/

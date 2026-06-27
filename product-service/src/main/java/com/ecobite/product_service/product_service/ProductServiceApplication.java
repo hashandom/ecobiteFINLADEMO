@@ -13,3 +13,5 @@ public class ProductServiceApplication {
 	}
 
 }
+
+/*Before RBAC*/

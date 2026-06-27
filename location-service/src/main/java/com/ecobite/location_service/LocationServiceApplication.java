@@ -14,3 +14,4 @@ public class LocationServiceApplication {
 
 }
 
+/*Before RBAC*/

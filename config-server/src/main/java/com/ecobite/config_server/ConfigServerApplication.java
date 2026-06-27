@@ -13,3 +13,5 @@ public class ConfigServerApplication {
 	}
 
 }
+
+/*Before RBAC*/

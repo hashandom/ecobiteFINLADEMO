@@ -27,4 +27,6 @@ public interface BatchService {
     Long getBatchCount();
 
     Long getExpiringSoonCount();
+
+    List<BatchResponse> getAllBatches();
 }

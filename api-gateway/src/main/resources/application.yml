@@ -23,6 +23,7 @@ spring:
             allowedOrigins:
               - "http://localhost:3000"
               - "http://localhost:5173"
+              - "https://ecobiteims.vercel.app/"
               - "null"
             allowedMethods:
               - GET

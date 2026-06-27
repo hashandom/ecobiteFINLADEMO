@@ -20,6 +20,14 @@ import java.util.List;
 public class BatchController {
     private final BatchServiceImpl service;
 
+    @GetMapping
+    public ResponseEntity<List<BatchResponse>> getAllBatches() {
+
+        return ResponseEntity.ok(
+                service.getAllBatches()
+        );
+    }
+
     @PostMapping("/reduce/{batchId}")
     public String reduceStock(
             @PathVariable Long batchId,

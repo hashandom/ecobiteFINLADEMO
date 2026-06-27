@@ -362,6 +362,14 @@ public class BatchServiceImpl implements BatchService {
                 .size();
     }
 
+    @Override
+    public List<BatchResponse> getAllBatches() {
+        return repository.findAll()
+                .stream()
+                .map(this::mapToResponse)
+                .toList();
+    }
+
     private BatchResponse mapToResponse(Batch batch) {
 
         return BatchResponse.builder()

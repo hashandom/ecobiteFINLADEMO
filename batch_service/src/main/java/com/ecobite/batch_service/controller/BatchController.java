@@ -10,6 +10,7 @@ import com.ecobite.batch_service.service.BatchServiceImpl;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,23 +21,13 @@ import java.util.List;
 public class BatchController {
     private final BatchServiceImpl service;
 
+    @PreAuthorize("hasAnyRole('ADMIN','MANAGER','STAFF')")
     @GetMapping
     public ResponseEntity<List<BatchResponse>> getAllBatches() {
-
-        return ResponseEntity.ok(
-                service.getAllBatches()
-        );
+        return ResponseEntity.ok(service.getAllBatches());
     }
 
-    @PostMapping("/reduce/{batchId}")
-    public String reduceStock(
-            @PathVariable Long batchId,
-            @RequestBody ReduceStockRequest request) {
-
-        service.reduceStock(batchId, request);
-        return "Stock updated successfully";
-    }
-
+    @PreAuthorize("hasAnyRole('ADMIN','MANAGER','STAFF')")
     @GetMapping("/expiring-soon")
     public ResponseEntity<List<BatchResponse>> getExpiringSoon(
             @RequestParam int days) {
@@ -44,53 +35,87 @@ public class BatchController {
         return ResponseEntity.ok(service.getExpiringSoon(days));
     }
 
-
-    @PostMapping("/allocate")
-    public ResponseEntity<List<BatchAllocationResponse>> allocate(
-            @RequestBody AllocateBatchRequest request){
-
-        return ResponseEntity.ok(service.allocateBatch(request));
-    }
-
-    @PostMapping
-    public ResponseEntity<BatchResponse> createBatch(
-           @Valid @RequestBody CreateBatchRequest request){
-
-        return ResponseEntity.ok(service.createBatch(request));
-    }
-
+    @PreAuthorize("hasAnyRole('ADMIN','MANAGER','STAFF')")
     @GetMapping("/count")
     public Long getBatchCount() {
         return service.getBatchCount();
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN','MANAGER','STAFF')")
     @GetMapping("/expiring/count")
     public Long getExpiringSoonCount() {
         return service.getExpiringSoonCount();
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN','MANAGER','STAFF')")
     @GetMapping("/{id}")
-    public ResponseEntity<BatchResponse> getBatch(@PathVariable Long id){
-        return ResponseEntity.ok(service.getBatchById(id));
+    public ResponseEntity<BatchResponse> getBatch(
+            @PathVariable Long id) {
+
+        return ResponseEntity.ok(
+                service.getBatchById(id)
+        );
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN','MANAGER','STAFF')")
     @GetMapping("/product/{productId}")
     public ResponseEntity<List<BatchResponse>> getBatches(
-            @PathVariable String productId){
+            @PathVariable String productId) {
 
-        return ResponseEntity.ok(service.getBatchesByProduct(productId));
+        return ResponseEntity.ok(
+                service.getBatchesByProduct(productId)
+        );
     }
 
 
+    @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")
+    @PostMapping
+    public ResponseEntity<BatchResponse> createBatch(
+            @Valid @RequestBody CreateBatchRequest request) {
+
+        return ResponseEntity.ok(
+                service.createBatch(request)
+        );
+    }
+
+    @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")
+    @PostMapping("/allocate")
+    public ResponseEntity<List<BatchAllocationResponse>> allocate(
+            @RequestBody AllocateBatchRequest request) {
+
+        return ResponseEntity.ok(
+                service.allocateBatch(request)
+        );
+    }
+
+    @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")
+    @PostMapping("/reduce/{batchId}")
+    public String reduceStock(
+            @PathVariable Long batchId,
+            @RequestBody ReduceStockRequest request) {
+
+        service.reduceStock(batchId, request);
+
+        return "Stock updated successfully";
+    }
+
+    @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")
     @PutMapping("/{id}/spoil")
-    public ResponseEntity<BatchResponse> spoilBatch(@PathVariable Long id){
+    public ResponseEntity<BatchResponse> spoilBatch(
+            @PathVariable Long id) {
 
-        return ResponseEntity.ok(service.spoilBatch(id));
+        return ResponseEntity.ok(
+                service.spoilBatch(id)
+        );
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")
     @PutMapping("/{id}/recall")
-    public ResponseEntity<BatchResponse> recallBatch(@PathVariable Long id){
+    public ResponseEntity<BatchResponse> recallBatch(
+            @PathVariable Long id) {
 
-        return ResponseEntity.ok(service.recallBatch(id));
+        return ResponseEntity.ok(
+                service.recallBatch(id)
+        );
     }
 }

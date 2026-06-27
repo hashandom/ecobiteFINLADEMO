@@ -21,49 +21,15 @@ public class SecurityConfig {
 
         http
                 .csrf(csrf -> csrf.disable())
-                .addFilterBefore(jwtValidationFilter,
-                        UsernamePasswordAuthenticationFilter.class)
-                .authorizeHttpRequests(auth -> auth
 
-//                        .requestMatchers("/products").hasAnyRole("ADMIN","MANAGER","STAFF")
-//
-//                        .requestMatchers("/products/{id}")
-//                        .hasAnyRole("ADMIN","MANAGER","STAFF")
-//
-//                        .requestMatchers("/products/search")
-//                        .hasAnyRole("ADMIN","MANAGER","STAFF")
-//
-//                        .requestMatchers("/products/category/**")
-//                        .hasAnyRole("ADMIN","MANAGER","STAFF")
-//
-//                        .requestMatchers("/products/low-stock")
-//                        .hasAnyRole("ADMIN","MANAGER")
-//
-//                        .requestMatchers("/products/update-stock/**")
-//                        .hasAnyRole("ADMIN","MANAGER")
-//
-//                        .requestMatchers("/products/**")
-//                        .hasRole("ADMIN")
-//
-                                // PUBLIC READ API
-                                .requestMatchers(
-                                        HttpMethod.GET,
-                                        "/batches/*"
-                                ).permitAll()
+                .addFilterBefore(
+                        jwtValidationFilter,
+                        UsernamePasswordAuthenticationFilter.class
+                )
 
-                                // PROTECTED WRITE APIs
-                                .requestMatchers(
-                                        "/batches/**"
-                                ).hasAnyRole(
-                                        "ADMIN",
-                                        "MANAGER",
-                                        "STAFF"
-                                )
-
-                                .anyRequest()
-                                .authenticated()
+                .authorizeHttpRequests(auth ->
+                        auth.anyRequest().authenticated()
                 );
-
 
         return http.build();
     }

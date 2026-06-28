@@ -15,7 +15,11 @@ import java.util.List;
 public class SupplierController {
     private final SupplierService supplierService;
 
-    @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")
+    // ================= WRITE OPERATIONS =================
+
+    @PreAuthorize(
+            "hasAnyRole('ADMIN','MANAGER') or hasAuthority('SUPPLIER_CREATE')"
+    )
     @PostMapping
     public SupplierResponseDTO create(
             @Valid @RequestBody SupplierRequestDTO dto) {
@@ -23,7 +27,9 @@ public class SupplierController {
         return supplierService.createSupplier(dto);
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")
+    @PreAuthorize(
+            "hasAnyRole('ADMIN','MANAGER') or hasAuthority('SUPPLIER_UPDATE')"
+    )
     @PutMapping("/{id}")
     public SupplierResponseDTO update(
             @PathVariable Long id,
@@ -32,7 +38,9 @@ public class SupplierController {
         return supplierService.updateSupplier(id, dto);
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")
+    @PreAuthorize(
+            "hasRole('ADMIN') or hasAuthority('SUPPLIER_DELETE')"
+    )
     @DeleteMapping("/{id}")
     public String delete(@PathVariable Long id) {
 
@@ -41,7 +49,9 @@ public class SupplierController {
         return "Supplier deleted successfully";
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")
+    @PreAuthorize(
+            "hasAnyRole('ADMIN','MANAGER') or hasAuthority('SUPPLIER_ASSIGN_PRODUCT')"
+    )
     @PostMapping("/assign-product")
     public String assignProduct(
             @RequestBody AssignProductRequestDTO dto) {
@@ -51,7 +61,9 @@ public class SupplierController {
         return "Product assigned to supplier";
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")
+    @PreAuthorize(
+            "hasAnyRole('ADMIN','MANAGER') or hasAuthority('SUPPLIER_UPDATE_RATING')"
+    )
     @PutMapping("/{id}/rating")
     public SupplierResponseDTO updateRating(
             @PathVariable Long id,
@@ -63,14 +75,19 @@ public class SupplierController {
         );
     }
 
+    // ================= READ OPERATIONS =================
 
-    @PreAuthorize("hasAnyRole('ADMIN','MANAGER','STAFF')")
+    @PreAuthorize(
+            "hasAnyRole('ADMIN','MANAGER','STAFF') or hasAuthority('SUPPLIER_READ')"
+    )
     @GetMapping("/count")
     public Long getSupplierCount() {
         return supplierService.getSupplierCount();
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN','MANAGER','STAFF')")
+    @PreAuthorize(
+            "hasAnyRole('ADMIN','MANAGER','STAFF') or hasAuthority('SUPPLIER_READ')"
+    )
     @GetMapping("/{id}")
     public SupplierResponseDTO get(
             @PathVariable Long id) {
@@ -78,13 +95,17 @@ public class SupplierController {
         return supplierService.getSupplier(id);
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN','MANAGER','STAFF')")
+    @PreAuthorize(
+            "hasAnyRole('ADMIN','MANAGER','STAFF') or hasAuthority('SUPPLIER_READ')"
+    )
     @GetMapping
     public List<SupplierResponseDTO> getAll() {
         return supplierService.getAllSuppliers();
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN','MANAGER','STAFF')")
+    @PreAuthorize(
+            "hasAnyRole('ADMIN','MANAGER','STAFF') or hasAuthority('SUPPLIER_READ')"
+    )
     @GetMapping("/{id}/products")
     public List<ProductResponseDTO> getProducts(
             @PathVariable Long id) {
@@ -92,7 +113,9 @@ public class SupplierController {
         return supplierService.getProductsBySupplier(id);
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN','MANAGER','STAFF')")
+    @PreAuthorize(
+            "hasAnyRole('ADMIN','MANAGER','STAFF') or hasAuthority('SUPPLIER_READ')"
+    )
     @GetMapping("/best/{productId}")
     public SupplierResponseDTO getBestSupplier(
             @PathVariable String productId) {

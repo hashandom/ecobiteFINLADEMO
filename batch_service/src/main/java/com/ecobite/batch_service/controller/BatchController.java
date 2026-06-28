@@ -21,13 +21,19 @@ import java.util.List;
 public class BatchController {
     private final BatchServiceImpl service;
 
-    @PreAuthorize("hasAnyRole('ADMIN','MANAGER','STAFF')")
+    // ================= READ OPERATIONS =================
+
+    @PreAuthorize(
+            "hasAnyRole('ADMIN','MANAGER','STAFF') or hasAuthority('BATCH_READ')"
+    )
     @GetMapping
     public ResponseEntity<List<BatchResponse>> getAllBatches() {
         return ResponseEntity.ok(service.getAllBatches());
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN','MANAGER','STAFF')")
+    @PreAuthorize(
+            "hasAnyRole('ADMIN','MANAGER','STAFF') or hasAuthority('BATCH_READ')"
+    )
     @GetMapping("/expiring-soon")
     public ResponseEntity<List<BatchResponse>> getExpiringSoon(
             @RequestParam int days) {
@@ -35,19 +41,25 @@ public class BatchController {
         return ResponseEntity.ok(service.getExpiringSoon(days));
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN','MANAGER','STAFF')")
+    @PreAuthorize(
+            "hasAnyRole('ADMIN','MANAGER','STAFF') or hasAuthority('BATCH_READ')"
+    )
     @GetMapping("/count")
     public Long getBatchCount() {
         return service.getBatchCount();
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN','MANAGER','STAFF')")
+    @PreAuthorize(
+            "hasAnyRole('ADMIN','MANAGER','STAFF') or hasAuthority('BATCH_READ')"
+    )
     @GetMapping("/expiring/count")
     public Long getExpiringSoonCount() {
         return service.getExpiringSoonCount();
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN','MANAGER','STAFF')")
+    @PreAuthorize(
+            "hasAnyRole('ADMIN','MANAGER','STAFF') or hasAuthority('BATCH_READ')"
+    )
     @GetMapping("/{id}")
     public ResponseEntity<BatchResponse> getBatch(
             @PathVariable Long id) {
@@ -57,7 +69,9 @@ public class BatchController {
         );
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN','MANAGER','STAFF')")
+    @PreAuthorize(
+            "hasAnyRole('ADMIN','MANAGER','STAFF') or hasAuthority('BATCH_READ')"
+    )
     @GetMapping("/product/{productId}")
     public ResponseEntity<List<BatchResponse>> getBatches(
             @PathVariable String productId) {
@@ -67,8 +81,11 @@ public class BatchController {
         );
     }
 
+    // ================= WRITE OPERATIONS =================
 
-    @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")
+    @PreAuthorize(
+            "hasAnyRole('ADMIN','MANAGER') or hasAuthority('BATCH_CREATE')"
+    )
     @PostMapping
     public ResponseEntity<BatchResponse> createBatch(
             @Valid @RequestBody CreateBatchRequest request) {
@@ -78,7 +95,9 @@ public class BatchController {
         );
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")
+    @PreAuthorize(
+            "hasAnyRole('ADMIN','MANAGER') or hasAuthority('BATCH_ALLOCATE')"
+    )
     @PostMapping("/allocate")
     public ResponseEntity<List<BatchAllocationResponse>> allocate(
             @RequestBody AllocateBatchRequest request) {
@@ -88,7 +107,9 @@ public class BatchController {
         );
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")
+    @PreAuthorize(
+            "hasAnyRole('ADMIN','MANAGER') or hasAuthority('BATCH_UPDATE')"
+    )
     @PostMapping("/reduce/{batchId}")
     public String reduceStock(
             @PathVariable Long batchId,
@@ -99,7 +120,9 @@ public class BatchController {
         return "Stock updated successfully";
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")
+    @PreAuthorize(
+            "hasAnyRole('ADMIN','MANAGER') or hasAuthority('BATCH_SPOIL')"
+    )
     @PutMapping("/{id}/spoil")
     public ResponseEntity<BatchResponse> spoilBatch(
             @PathVariable Long id) {
@@ -109,7 +132,9 @@ public class BatchController {
         );
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")
+    @PreAuthorize(
+            "hasAnyRole('ADMIN','MANAGER') or hasAuthority('BATCH_RECALL')"
+    )
     @PutMapping("/{id}/recall")
     public ResponseEntity<BatchResponse> recallBatch(
             @PathVariable Long id) {

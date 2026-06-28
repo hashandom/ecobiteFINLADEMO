@@ -1,10 +1,12 @@
 package com.ecobite.auth_service.entity;
 
+import com.ecobite.auth_service.enums.Permission;
 import com.ecobite.auth_service.enums.Role;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -27,6 +29,15 @@ public class User {
 
     @Enumerated(EnumType.STRING)
     private Role role;
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(
+            name = "user_permissions",
+            joinColumns = @JoinColumn(name = "user_id")
+    )
+    @Enumerated(EnumType.STRING)
+    @Column(name = "permission")
+    private Set<Permission> permissions;
 
     private String status;
 

@@ -49,6 +49,7 @@ public class AuthServiceImpl implements AuthService{
                 passwordEncoder.encode(request.getPassword())
         );
         user.setRole(request.getRole());
+        user.setPermissions(request.getPermissions());
         user.setStatus("ACTIVE");
         user.setLocked(false);
         user.setFailedAttempts(0);
@@ -87,7 +88,8 @@ public class AuthServiceImpl implements AuthService{
 
         String token = jwtService.generateToken(
                 user.getUsername(),
-                String.valueOf(user.getRole())
+                user.getRole().name(),
+                user.getPermissions()
         );
 
         return new AuthResponse(
@@ -217,6 +219,7 @@ public class AuthServiceImpl implements AuthService{
         user.setRole(request.getRole());
         user.setStatus(request.getStatus());
         user.setLocked(request.isLocked());
+        user.setPermissions(request.getPermissions());
 
         repository.save(user);
 

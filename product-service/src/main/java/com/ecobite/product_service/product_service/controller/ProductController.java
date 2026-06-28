@@ -16,10 +16,6 @@ import java.util.List;
 public class ProductController {
     private final ProductService service;
 
-    public ProductController(ProductService service) {
-        this.service = service;
-    }
-
 
 //    @PutMapping("/add-stock/{id}")
 //    public ProductResponse addStock(
@@ -38,9 +34,15 @@ public class ProductController {
 
 
 
+    public ProductController(ProductService service) {
+        this.service = service;
+    }
+
     // ================= WRITE OPERATIONS =================
 
-    @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")
+    @PreAuthorize(
+            "hasAnyRole('ADMIN','MANAGER') or hasAuthority('PRODUCT_CREATE')"
+    )
     @PostMapping
     public ProductResponse createProduct(
             @Valid @RequestBody ProductRequest request) {
@@ -48,7 +50,9 @@ public class ProductController {
         return service.createProduct(request);
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")
+    @PreAuthorize(
+            "hasAnyRole('ADMIN','MANAGER') or hasAuthority('PRODUCT_UPDATE')"
+    )
     @PutMapping("/{id}")
     public ProductResponse updateProduct(
             @PathVariable String id,
@@ -57,16 +61,21 @@ public class ProductController {
         return service.updateProduct(id, request);
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")
+    @PreAuthorize(
+            "hasRole('ADMIN') or hasAuthority('PRODUCT_DELETE')"
+    )
     @DeleteMapping("/{id}")
-    public String deleteProduct(@PathVariable String id) {
+    public String deleteProduct(
+            @PathVariable String id) {
 
         service.deleteProduct(id);
 
         return "Product deleted successfully";
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")
+    @PreAuthorize(
+            "hasAnyRole('ADMIN','MANAGER') or hasAuthority('PRODUCT_UPDATE_STOCK')"
+    )
     @PutMapping("/update-stock/{id}")
     public ProductResponse updateStock(
             @PathVariable String id,
@@ -77,13 +86,17 @@ public class ProductController {
 
     // ================= READ OPERATIONS =================
 
-    @PreAuthorize("hasAnyRole('ADMIN','MANAGER','STAFF')")
+    @PreAuthorize(
+            "hasAnyRole('ADMIN','MANAGER','STAFF') or hasAuthority('PRODUCT_READ')"
+    )
     @GetMapping
     public List<ProductResponse> getAllProducts() {
         return service.getAllProducts();
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN','MANAGER','STAFF')")
+    @PreAuthorize(
+            "hasAnyRole('ADMIN','MANAGER','STAFF') or hasAuthority('PRODUCT_READ')"
+    )
     @GetMapping("/{id}")
     public ProductResponse getProductById(
             @PathVariable String id) {
@@ -91,14 +104,18 @@ public class ProductController {
         return service.getProductById(id);
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN','MANAGER','STAFF')")
+    @PreAuthorize(
+            "hasAnyRole('ADMIN','MANAGER','STAFF') or hasAuthority('PRODUCT_READ')"
+    )
     @GetMapping("/low-stock")
     public List<ProductResponse> getLowStockProducts() {
 
         return service.getLowStockProducts();
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN','MANAGER','STAFF')")
+    @PreAuthorize(
+            "hasAnyRole('ADMIN','MANAGER','STAFF') or hasAuthority('PRODUCT_READ')"
+    )
     @GetMapping("/search")
     public List<ProductResponse> searchProduct(
             @RequestParam String name) {
@@ -106,7 +123,9 @@ public class ProductController {
         return service.searchProduct(name);
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN','MANAGER','STAFF')")
+    @PreAuthorize(
+            "hasAnyRole('ADMIN','MANAGER','STAFF') or hasAuthority('PRODUCT_READ')"
+    )
     @GetMapping("/category/{category}")
     public List<ProductResponse> getProductsByCategory(
             @PathVariable String category) {
@@ -114,14 +133,18 @@ public class ProductController {
         return service.getProductsByCategory(category);
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN','MANAGER','STAFF')")
+    @PreAuthorize(
+            "hasAnyRole('ADMIN','MANAGER','STAFF') or hasAuthority('PRODUCT_READ')"
+    )
     @GetMapping("/count")
     public Long getProductCount() {
 
         return service.getProductCount();
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN','MANAGER','STAFF')")
+    @PreAuthorize(
+            "hasAnyRole('ADMIN','MANAGER','STAFF') or hasAuthority('PRODUCT_READ')"
+    )
     @GetMapping("/low-stock/count")
     public Long getLowStockCount() {
 

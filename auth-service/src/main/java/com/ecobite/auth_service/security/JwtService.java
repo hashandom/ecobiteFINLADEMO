@@ -6,6 +6,10 @@ import io.jsonwebtoken.security.Keys;
 import org.springframework.stereotype.Service;
 import java.security.Key;
 import java.util.Date;
+import com.ecobite.auth_service.enums.Permission;
+
+import java.util.List;
+import java.util.Set;
 
 @Service
 public class JwtService {
@@ -16,11 +20,12 @@ public class JwtService {
         return Keys.hmacShaKeyFor(SECRET.getBytes());
     }
 
-    public String generateToken(String username,String role){
+    public String generateToken(String username,String role , Set<Permission> permissions){
 
         return Jwts.builder()
                 .setSubject(username)
                 .claim("role",role)
+                .claim("permissions", permissions)
                 .setIssuedAt(new Date())
                 .setExpiration(
                         new Date(System.currentTimeMillis()+86400000)
@@ -60,5 +65,15 @@ public class JwtService {
                 .parseClaimsJws(token)
                 .getBody()
                 .get("role", String.class);
+    }
+
+    public List<String> extractPermissions(String token){
+
+        return Jwts.parserBuilder()
+                .setSigningKey(key())
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .get("permissions", List.class);
     }
 }

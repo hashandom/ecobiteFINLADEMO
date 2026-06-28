@@ -19,8 +19,11 @@ public class LocationController {
         this.service = service;
     }
 
+    // ================= WRITE OPERATIONS =================
 
-    @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")
+    @PreAuthorize(
+            "hasAnyRole('ADMIN','MANAGER') or hasAuthority('LOCATION_CREATE')"
+    )
     @PostMapping
     public ResponseEntity<LocationResponse> create(
             @Valid @RequestBody CreateLocationRequest request) {
@@ -30,7 +33,9 @@ public class LocationController {
         );
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")
+    @PreAuthorize(
+            "hasAnyRole('ADMIN','MANAGER') or hasAuthority('LOCATION_ASSIGN_BATCH')"
+    )
     @PostMapping("/assign")
     public ResponseEntity<Map<String, String>> assign(
             @Valid @RequestBody AssignBatchRequest request) {
@@ -45,7 +50,9 @@ public class LocationController {
         );
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")
+    @PreAuthorize(
+            "hasAnyRole('ADMIN','MANAGER') or hasAuthority('LOCATION_MOVE_BATCH')"
+    )
     @PostMapping("/move")
     public ResponseEntity<Map<String, Object>> move(
             @Valid @RequestBody MoveBatchRequest request) {
@@ -65,7 +72,9 @@ public class LocationController {
 
     // ================= READ OPERATIONS =================
 
-    @PreAuthorize("hasAnyRole('ADMIN','MANAGER','STAFF')")
+    @PreAuthorize(
+            "hasAnyRole('ADMIN','MANAGER','STAFF') or hasAuthority('LOCATION_READ')"
+    )
     @GetMapping
     public ResponseEntity<List<LocationResponse>> getAllLocations() {
         return ResponseEntity.ok(
@@ -73,13 +82,17 @@ public class LocationController {
         );
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN','MANAGER','STAFF')")
+    @PreAuthorize(
+            "hasAnyRole('ADMIN','MANAGER','STAFF') or hasAuthority('LOCATION_READ')"
+    )
     @GetMapping("/warehouses/count")
     public Long getWarehouseCount() {
         return service.getWarehouseCount();
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN','MANAGER','STAFF')")
+    @PreAuthorize(
+            "hasAnyRole('ADMIN','MANAGER','STAFF') or hasAuthority('LOCATION_READ')"
+    )
     @GetMapping("/{locationId}/inventory")
     public ResponseEntity<List<InventoryLocationResponse>>
     getInventoryByLocation(
@@ -90,7 +103,9 @@ public class LocationController {
         );
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN','MANAGER','STAFF')")
+    @PreAuthorize(
+            "hasAnyRole('ADMIN','MANAGER','STAFF') or hasAuthority('LOCATION_READ')"
+    )
     @GetMapping("/batch/{batchId}")
     public ResponseEntity<List<InventoryLocationResponse>>
     getLocationsByBatch(
@@ -101,7 +116,9 @@ public class LocationController {
         );
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN','MANAGER','STAFF')")
+    @PreAuthorize(
+            "hasAnyRole('ADMIN','MANAGER','STAFF') or hasAuthority('LOCATION_READ')"
+    )
     @GetMapping("/{id}")
     public ResponseEntity<LocationResponse> getLocationById(
             @PathVariable Long id) {

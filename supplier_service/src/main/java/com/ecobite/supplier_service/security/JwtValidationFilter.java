@@ -45,14 +45,42 @@ public class JwtValidationFilter implements Filter {
                 }
 
                 String username = jwtService.extractUsername(token);
+
                 String role = jwtService.extractRole(token);
+
+                List<SimpleGrantedAuthority> authorities =
+                        new java.util.ArrayList<>();
+
+// Role authority
+                authorities.add(
+                        new SimpleGrantedAuthority(
+                                "ROLE_" + role
+                        )
+                );
+
+// Permission authorities
+                List<String> permissions =
+                        jwtService.extractPermissions(token);
+
+                if(permissions != null){
+                    permissions.forEach(permission ->
+                            authorities.add(
+                                    new SimpleGrantedAuthority(permission)
+                            )
+                    );
+                }
+
+                System.out.println("Authorities: " + authorities);
 
                 UsernamePasswordAuthenticationToken authentication =
                         new UsernamePasswordAuthenticationToken(
                                 username,
                                 null,
-                                List.of(new SimpleGrantedAuthority("ROLE_" + role))
+                                authorities
                         );
+
+                SecurityContextHolder.getContext()
+                        .setAuthentication(authentication);
 
                 SecurityContextHolder.getContext().setAuthentication(authentication);
 

@@ -15,6 +15,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -49,11 +50,29 @@ public class JWTValidationFilter implements Filter {
                 String username = jwtService.extractUsername(token);
                 String role = jwtService.extractRole(token);
 
+                List<SimpleGrantedAuthority> authorities = new ArrayList<>();
+
+// Add role authority
+                authorities.add(
+                        new SimpleGrantedAuthority("ROLE_" + role)
+                );
+
+// Add permission authorities
+                List<String> permissions = jwtService.extractPermissions(token);
+
+                if (permissions != null) {
+                    permissions.forEach(permission ->
+                            authorities.add(
+                                    new SimpleGrantedAuthority(permission)
+                            )
+                    );
+                }
+
                 UsernamePasswordAuthenticationToken authentication =
                         new UsernamePasswordAuthenticationToken(
                                 username,
                                 null,
-                                List.of(new SimpleGrantedAuthority("ROLE_" + role))
+                                authorities
                         );
 
                 SecurityContextHolder.getContext().setAuthentication(authentication);

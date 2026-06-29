@@ -3,6 +3,7 @@ package com.ecobite.auth_service.controller;
 import com.ecobite.auth_service.dto.request.*;
 import com.ecobite.auth_service.dto.response.ApiResponse;
 import com.ecobite.auth_service.dto.response.AuthResponse;
+import com.ecobite.auth_service.dto.response.RegisterResponse;
 import com.ecobite.auth_service.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -71,10 +72,13 @@ public class AuthController {
     public ApiResponse register(
             @RequestBody RegisterRequest request) {
 
+        RegisterResponse response =
+                service.register(request);
+
         return new ApiResponse(
                 true,
-                service.register(request),
-                null
+                response.getMessage(),
+                response
         );
     }
 

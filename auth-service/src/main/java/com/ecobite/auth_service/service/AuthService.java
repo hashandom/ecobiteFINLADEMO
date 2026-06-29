@@ -3,12 +3,13 @@ package com.ecobite.auth_service.service;
 
 import com.ecobite.auth_service.dto.request.*;
 import com.ecobite.auth_service.dto.response.AuthResponse;
+import com.ecobite.auth_service.dto.response.RegisterResponse;
 import com.ecobite.auth_service.dto.response.UserResponse;
 
 import java.util.List;
 
 public interface AuthService {
-    String register(RegisterRequest request);
+    RegisterResponse register(RegisterRequest request);
 
     Object login(LoginRequest request);
 

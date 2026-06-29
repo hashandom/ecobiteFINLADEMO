@@ -23,4 +23,5 @@ public class UserResponse {
     private boolean locked;
 
     private Set<Permission> permissions;
+    private boolean firstLogin;
 }

@@ -2,6 +2,7 @@ package com.ecobite.auth_service.service;
 
 import com.ecobite.auth_service.dto.request.*;
 import com.ecobite.auth_service.dto.response.AuthResponse;
+import com.ecobite.auth_service.dto.response.RegisterResponse;
 import com.ecobite.auth_service.dto.response.UserResponse;
 import com.ecobite.auth_service.entity.BlackListedToken;
 import com.ecobite.auth_service.entity.User;
@@ -31,7 +32,7 @@ public class AuthServiceImpl implements AuthService{
     @Autowired
     private BlackListedTokenRepository blackListedTokenRepository;
     @Override
-    public String register(RegisterRequest request) {
+    public RegisterResponse register(RegisterRequest request) {
 
         if(repository.existsByUsername(request.getUsername())){
             throw new RuntimeException("Username already exists");
@@ -45,17 +46,34 @@ public class AuthServiceImpl implements AuthService{
 
         user.setUsername(request.getUsername());
         user.setEmail(request.getEmail());
+        String tempPassword =
+                UUID.randomUUID()
+                        .toString()
+                        .replace("-", "")
+                        .substring(0,4)
+                        +
+                        UUID.randomUUID()
+                                .toString()
+                                .replace("-", "")
+                                .substring(0,4)
+                                .toUpperCase();
+
         user.setPassword(
-                passwordEncoder.encode(request.getPassword())
+                passwordEncoder.encode(tempPassword)
         );
         user.setRole(request.getRole());
         user.setPermissions(request.getPermissions());
         user.setStatus("ACTIVE");
         user.setLocked(false);
+        user.setFirstLogin(true);
         user.setFailedAttempts(0);
         repository.save(user);
 
-        return "User registered successfully";
+        return new RegisterResponse(
+                user.getUsername(),
+                tempPassword,
+                "User registered successfully"
+        );
     }
 
     @Override
@@ -82,9 +100,10 @@ public class AuthServiceImpl implements AuthService{
             throw new RuntimeException("Invalid password");
         }
 
-        user.setLocked(false);
-        user.setFailedAttempts(0);
-        repository.save(user);
+        if(user.getFailedAttempts() > 0){
+            user.setFailedAttempts(0);
+            repository.save(user);
+        }
 
         String token = jwtService.generateToken(
                 user.getUsername(),
@@ -95,7 +114,8 @@ public class AuthServiceImpl implements AuthService{
         return new AuthResponse(
                 token,
                 user.getUsername(),
-                user.getRole()
+                user.getRole(),
+                user.isFirstLogin()
         );
     }
 
@@ -118,6 +138,7 @@ public class AuthServiceImpl implements AuthService{
         user.setPassword(
                 passwordEncoder.encode(request.getNewPassword())
         );
+        user.setFirstLogin(false);
         repository.save(user);
         return "Password updated successfully";
     }
@@ -160,6 +181,7 @@ public class AuthServiceImpl implements AuthService{
         );
         user.setResetToken(null);
         user.setTokenExpiry(null);
+        user.setFirstLogin(false);
         repository.save(user);
         return "Password reset successful";
     }
@@ -188,6 +210,7 @@ public class AuthServiceImpl implements AuthService{
                         .role(user.getRole())
                         .permissions(user.getPermissions())
                         .status(user.getStatus())
+                        .firstLogin(user.isFirstLogin())
                         .locked(user.isLocked())
                         .build())
                 .toList();
@@ -205,6 +228,7 @@ public class AuthServiceImpl implements AuthService{
                 .email(user.getEmail())
                 .role(user.getRole())
                 .permissions(user.getPermissions())
+                .firstLogin(user.isFirstLogin())
                 .status(user.getStatus())
                 .locked(user.isLocked())
                 .build();
@@ -217,6 +241,13 @@ public class AuthServiceImpl implements AuthService{
                 .orElseThrow(() ->
                         new RuntimeException("User not found"));
 
+        boolean roleChanged =
+                !user.getRole().equals(request.getRole());
+
+        boolean permissionChanged =
+                !user.getPermissions()
+                        .equals(request.getPermissions());
+
         user.setEmail(request.getEmail());
         user.setRole(request.getRole());
         user.setStatus(request.getStatus());
@@ -224,6 +255,10 @@ public class AuthServiceImpl implements AuthService{
         user.setPermissions(request.getPermissions());
 
         repository.save(user);
+
+        if(roleChanged || permissionChanged){
+            return "User updated successfully. User must login again for permission changes to take effect.";
+        }
 
         return "User updated successfully";
     }

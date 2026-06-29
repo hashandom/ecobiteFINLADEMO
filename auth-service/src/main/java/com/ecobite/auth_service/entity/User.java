@@ -49,4 +49,6 @@ public class User {
 
     private LocalDateTime tokenExpiry;
 
+    private boolean firstLogin = true;
+
 }

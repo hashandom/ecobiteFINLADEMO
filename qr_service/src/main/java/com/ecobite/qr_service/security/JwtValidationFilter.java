@@ -19,45 +19,98 @@ public class JwtValidationFilter implements Filter {
     private JwtService jwtService;
 
     @Override
-    public void doFilter(ServletRequest request,
-                         ServletResponse response,
-                         FilterChain chain)
-            throws IOException, ServletException {
+    public void doFilter(
+            ServletRequest request,
+            ServletResponse response,
+            FilterChain chain
+    ) throws IOException, ServletException {
 
-        HttpServletRequest httpRequest = (HttpServletRequest) request;
-        HttpServletResponse httpResponse = (HttpServletResponse) response;
+        HttpServletRequest httpRequest =
+                (HttpServletRequest) request;
 
-        String header = httpRequest.getHeader("Authorization");
+        HttpServletResponse httpResponse =
+                (HttpServletResponse) response;
 
-        if (header != null && header.startsWith("Bearer ")) {
+        String path =
+                httpRequest.getRequestURI();
 
-            String token = header.substring(7);
-            System.out.println("Authorization Header: " + header);
-            System.out.println("Token Extracted: " + token);
+        // Skip JWT validation for public endpoints
+        if (
+                path.startsWith("/qr/image/") ||
+                        path.startsWith("/qr/scan/") ||
+                        path.startsWith("/qr/batch/")
+        ) {
+            chain.doFilter(request, response);
+            return;
+        }
+
+        String header =
+                httpRequest.getHeader("Authorization");
+
+        if (
+                header != null &&
+                        header.startsWith("Bearer ")
+        ) {
+
+            String token =
+                    header.substring(7);
+
+            System.out.println(
+                    "Authorization Header: "
+                            + header
+            );
+
+            System.out.println(
+                    "Token Extracted: "
+                            + token
+            );
 
             try {
 
                 if (!jwtService.validateToken(token)) {
-                    httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                    httpResponse.getWriter().write("Invalid or Expired Token");
+
+                    httpResponse.setStatus(
+                            HttpServletResponse.SC_UNAUTHORIZED
+                    );
+
+                    httpResponse.getWriter().write(
+                            "Invalid or Expired Token"
+                    );
+
                     return;
                 }
 
-                String username = jwtService.extractUsername(token);
-                String role = jwtService.extractRole(token);
+                String username =
+                        jwtService.extractUsername(token);
+
+                String role =
+                        jwtService.extractRole(token);
 
                 UsernamePasswordAuthenticationToken authentication =
                         new UsernamePasswordAuthenticationToken(
                                 username,
                                 null,
-                                List.of(new SimpleGrantedAuthority("ROLE_" + role))
+                                List.of(
+                                        new SimpleGrantedAuthority(
+                                                "ROLE_" + role
+                                        )
+                                )
                         );
 
-                SecurityContextHolder.getContext().setAuthentication(authentication);
+                SecurityContextHolder
+                        .getContext()
+                        .setAuthentication(authentication);
 
             } catch (Exception e) {
-                httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                httpResponse.getWriter().write("Invalid Token");
+
+                httpResponse.setStatus(
+                        HttpServletResponse.SC_UNAUTHORIZED
+                );
+
+                httpResponse.getWriter().write(
+                        "Invalid Token"
+                );
+
                 return;
             }
         }

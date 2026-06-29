@@ -13,7 +13,7 @@ import com.ecobite.qr_service.feign.SupplierClient;
 import com.ecobite.qr_service.repository.QrRepository;
 import com.ecobite.qr_service.util.QrGeneratorUtil;
 import feign.FeignException;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -29,6 +29,12 @@ public class QrServiceImpl implements QrService {
     private final SupplierClient supplierClient;
 
     private final LocationClient locationClient;
+
+    @Value("${qr.storage-path}")
+    private String storagePath;
+
+    @Value("${qr.public-url}")
+    private String publicUrl;
 
     public QrServiceImpl(
             QrRepository qrRepository,
@@ -46,7 +52,7 @@ public class QrServiceImpl implements QrService {
     }
 
     @Override
-    public ScanQrResponse generateQr(
+    public GenerateQrResponse generateQr(
             GenerateQrRequest request
     ) {
 
@@ -103,24 +109,27 @@ public class QrServiceImpl implements QrService {
 
             // Generate QR scan URL
             String qrData =
-                    "http://192.168.1.2:8086/qr/scan/"
+                    publicUrl
+                            + "/qr/scan/"
                             + qrCodeId;
 
             String filePath =
-                    System.getProperty("user.dir")
-                            + "/qr_service/src/main/resources/static/qrcodes/"
+                    storagePath
+                            + "/"
                             + qrCodeId
                             + ".png";
 
-            System.out.println("QR FILE PATH: " + filePath);
+            System.out.println("Working Directory: "
+                    + System.getProperty("user.dir"));
+            System.out.println("QR File Path: "
+                    + filePath);
 
-            String qrImageUrl =
-                    QrGeneratorUtil.generateQrImage(
-                            qrData,
-                            300,
-                            300,
-                            filePath
-                    );
+            QrGeneratorUtil.generateQrImage(
+                    qrData,
+                    300,
+                    300,
+                    filePath
+            );
 
             // Create QR entity
             QrCode qrCode =
@@ -139,7 +148,7 @@ public class QrServiceImpl implements QrService {
             );
 
             qrCode.setQrImageUrl(
-                    qrImageUrl
+                    "/qr/image/" + qrCodeId
             );
 
             qrCode.setCreatedAt(
@@ -153,7 +162,17 @@ public class QrServiceImpl implements QrService {
             // Save QR
             qrRepository.save(qrCode);
 
-            return mapToResponse(qrCode);
+            GenerateQrResponse response =
+                    new GenerateQrResponse();
+
+            response.setQrCodeId(qrCode.getQrCodeId());
+            response.setBatchId(qrCode.getBatchId());
+            response.setQrImageUrl(
+                    publicUrl + qrCode.getQrImageUrl()
+            );
+            response.setStatus(qrCode.getStatus());
+
+            return response;
 
         } catch (Exception ex) {
 
@@ -269,7 +288,8 @@ public class QrServiceImpl implements QrService {
         );
 
         response.setQrImageUrl(
-                qrCode.getQrImageUrl()
+                publicUrl
+                        + qrCode.getQrImageUrl()
         );
 
         return response;
@@ -277,15 +297,7 @@ public class QrServiceImpl implements QrService {
 
     // Generate QR ID
     private String generateQrId() {
-
-        long count =
-                qrRepository.count() + 1;
-
-        return "QR"
-                + String.format(
-                "%03d",
-                count
-        );
+        return "QR" + System.currentTimeMillis();
     }
 
     // Entity -> DTO mapping
@@ -305,7 +317,8 @@ public class QrServiceImpl implements QrService {
         );
 
         response.setQrImageUrl(
-                qrCode.getQrImageUrl()
+                publicUrl
+                        + qrCode.getQrImageUrl()
         );
 
         response.setStatus(

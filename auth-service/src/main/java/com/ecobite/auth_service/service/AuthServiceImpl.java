@@ -186,6 +186,7 @@ public class AuthServiceImpl implements AuthService{
                         .username(user.getUsername())
                         .email(user.getEmail())
                         .role(user.getRole())
+                        .permissions(user.getPermissions())
                         .status(user.getStatus())
                         .locked(user.isLocked())
                         .build())
@@ -203,6 +204,7 @@ public class AuthServiceImpl implements AuthService{
                 .username(user.getUsername())
                 .email(user.getEmail())
                 .role(user.getRole())
+                .permissions(user.getPermissions())
                 .status(user.getStatus())
                 .locked(user.isLocked())
                 .build();

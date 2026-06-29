@@ -1,6 +1,15 @@
 package com.ecobite.auth_service.enums;
 
 public enum Permission {
+
+
+    PRODUCT_MODULE_ACCESS,
+    SUPPLIER_MODULE_ACCESS,
+    BATCH_MODULE_ACCESS,
+    LOCATION_MODULE_ACCESS,
+    QR_MODULE_ACCESS,
+    USER_MANAGEMENT_ACCESS,
+
     PRODUCT_READ,
     PRODUCT_CREATE,
     PRODUCT_UPDATE,

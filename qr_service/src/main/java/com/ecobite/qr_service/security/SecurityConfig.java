@@ -14,12 +14,16 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
     private final JwtValidationFilter jwtValidationFilter;
 
-    public SecurityConfig(JwtValidationFilter jwtValidationFilter) {
+    public SecurityConfig(
+            JwtValidationFilter jwtValidationFilter
+    ) {
         this.jwtValidationFilter = jwtValidationFilter;
     }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(
+            HttpSecurity http
+    ) throws Exception {
 
         http
                 .csrf(csrf -> csrf.disable())
@@ -29,11 +33,30 @@ public class SecurityConfig {
                         UsernamePasswordAuthenticationFilter.class
                 )
 
-                .authorizeHttpRequests(auth ->
-                        auth.anyRequest().authenticated()
+                .authorizeHttpRequests(auth -> auth
+
+                        // Public endpoints
+                        .requestMatchers("/qr/image/**")
+                        .permitAll()
+
+                        .requestMatchers("/qr/scan/**")
+                        .permitAll()
+
+                        .requestMatchers("/qr/batch/**")
+                        .permitAll()
+
+                        // Protected endpoint
+                        .requestMatchers("/qr/generate")
+                        .hasAnyRole(
+                                "ADMIN",
+                                "MANAGER",
+                                "STAFF"
+                        )
+
+                        .anyRequest()
+                        .authenticated()
                 );
 
         return http.build();
     }
-
 }

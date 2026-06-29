@@ -118,6 +118,8 @@ services:
     restart: always
     ports:
       - "8086:8086"
+    volumes:
+      - qr_images:/app/qrcodes
     depends_on:
       - mysql
 
@@ -163,3 +165,4 @@ services:
 
 volumes:
   mysql_data:
+  qr_images:

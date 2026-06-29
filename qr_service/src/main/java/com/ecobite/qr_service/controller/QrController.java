@@ -3,6 +3,7 @@ package com.ecobite.qr_service.controller;
 import com.ecobite.qr_service.dto.request.GenerateQrRequest;
 import com.ecobite.qr_service.dto.response.ApiResponse;
 import com.ecobite.qr_service.dto.response.GenerateQrResponse;
+import com.ecobite.qr_service.dto.response.QrListResponse;
 import com.ecobite.qr_service.dto.response.ScanQrResponse;
 import com.ecobite.qr_service.service.QrService;
 import org.springframework.core.io.Resource;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @RestController
 @RequestMapping("/qr")
@@ -119,6 +121,19 @@ public class QrController {
                         200,
                         "QR retrieved successfully",
                         response,
+                        LocalDateTime.now()
+                )
+        );
+    }
+
+    @GetMapping("/all-QRImages")
+    public ResponseEntity<ApiResponse<List<QrListResponse>>> getAllQrCodes() {
+
+        return ResponseEntity.ok(
+                new ApiResponse<>(
+                        200,
+                        "QR codes retrieved successfully",
+                        qrService.getAllQrCodes(),
                         LocalDateTime.now()
                 )
         );

@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class QrServiceImpl implements QrService {
@@ -326,5 +327,40 @@ public class QrServiceImpl implements QrService {
         );
 
         return response;
+    }
+
+    @Override
+    public List<QrListResponse> getAllQrCodes() {
+
+        return qrRepository.findAll()
+                .stream()
+                .map(qr -> {
+
+                    QrListResponse response =
+                            new QrListResponse();
+
+                    response.setQrCodeId(
+                            qr.getQrCodeId()
+                    );
+
+                    response.setBatchId(
+                            qr.getBatchId()
+                    );
+
+                    response.setQrImageUrl(
+                            publicUrl + qr.getQrImageUrl()
+                    );
+
+                    response.setStatus(
+                            qr.getStatus()
+                    );
+
+                    response.setCreatedAt(
+                            qr.getCreatedAt()
+                    );
+
+                    return response;
+                })
+                .toList();
     }
 }

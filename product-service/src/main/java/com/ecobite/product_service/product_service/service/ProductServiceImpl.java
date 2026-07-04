@@ -13,6 +13,7 @@ import com.ecobite.product_service.product_service.repository.ProductRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -54,11 +55,6 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ProductResponse createProduct(ProductRequest request) {
-        if (repository.existsByNameIgnoreCase(request.getName())) {
-            throw new DuplicateProductException(
-                    "Product '" + request.getName() + "' already exists."
-            );
-        }
 
         Product product = Product.builder()
                 .id(generateProductId())
@@ -68,6 +64,12 @@ public class ProductServiceImpl implements ProductService {
                 .reorderLevel(request.getReorderLevel())
                 .unitPrice(request.getUnitPrice())
                 .build();
+
+        if(repository.findByNameIgnoreCase(request.getName()).isPresent()){
+            throw new DuplicateProductException(
+                    "Product '" + request.getName() + "' already exists."
+            );
+        }
 
         repository.save(product);
 
@@ -106,6 +108,17 @@ public class ProductServiceImpl implements ProductService {
 
         Product product = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
+
+        Optional<Product> existing =
+                repository.findByNameIgnoreCase(request.getName());
+
+        if(existing.isPresent()
+                && !existing.get().getId().equals(id)){
+
+            throw new DuplicateProductException(
+                    "Product '" + request.getName() + "' already exists."
+            );
+        }
 
         product.setName(request.getName());
         product.setCategory(request.getCategory());
@@ -150,7 +163,7 @@ public class ProductServiceImpl implements ProductService {
 
         return repository.findAll()
                 .stream()
-                .filter(p -> p.getStock() < p.getReorderLevel())
+                .filter(p -> p.getStock() <= p.getReorderLevel())
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
@@ -164,7 +177,7 @@ public class ProductServiceImpl implements ProductService {
         product.setStock(stock);
 
         // LOW STOCK ALERT
-        if (stock < product.getReorderLevel() && !product.isLowStockAlertSent()) {
+        if (stock <= product.getReorderLevel() && !product.isLowStockAlertSent()) {
 
             ProductEvent event = new ProductEvent();
             event.setEventType("LOW_STOCK");

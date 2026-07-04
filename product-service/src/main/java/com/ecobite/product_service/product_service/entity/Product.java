@@ -54,7 +54,7 @@ public class Product {
         return reorderLevel;
     }
 
-    @Column(nullable=false)
+    @Column(nullable = false, unique = true)
     private String name;
 
     private String category;

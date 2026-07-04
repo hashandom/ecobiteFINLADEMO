@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ProductRepository extends JpaRepository<Product, String> {
     List<Product> findByStockLessThan(int stock);
@@ -15,4 +16,8 @@ public interface ProductRepository extends JpaRepository<Product, String> {
 
     @Query("SELECT p.id FROM Product p ORDER BY p.id DESC LIMIT 1")
     String findLastProductId();
+
+    Optional<Product> findByNameIgnoreCase(String name);
+
+    boolean existsByNameIgnoreCase(String name);
 }

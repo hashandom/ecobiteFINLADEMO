@@ -5,6 +5,7 @@ import com.ecobite.product_service.product_service.dto.ProductRequest;
 import com.ecobite.product_service.product_service.dto.ProductResponse;
 import com.ecobite.product_service.product_service.dto.event.ProductEvent;
 import com.ecobite.product_service.product_service.entity.Product;
+import com.ecobite.product_service.product_service.exception.DuplicateProductException;
 import com.ecobite.product_service.product_service.exception.ResourceNotFoundException;
 import com.ecobite.product_service.product_service.feign.BatchClient;
 import com.ecobite.product_service.product_service.kafkaEventProducer.ProductEventProducer;
@@ -53,6 +54,11 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ProductResponse createProduct(ProductRequest request) {
+        if (repository.existsByNameIgnoreCase(request.getName())) {
+            throw new DuplicateProductException(
+                    "Product '" + request.getName() + "' already exists."
+            );
+        }
 
         Product product = Product.builder()
                 .id(generateProductId())

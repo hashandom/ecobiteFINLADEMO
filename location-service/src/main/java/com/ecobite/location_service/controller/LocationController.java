@@ -127,4 +127,34 @@ public class LocationController {
                 service.getLocationById(id)
         );
     }
+
+    @PreAuthorize(
+            "hasAnyRole('ADMIN','MANAGER') or hasAuthority('LOCATION_UPDATE')"
+    )
+    @PutMapping("/{id}")
+    public ResponseEntity<LocationResponse> updateLocation(
+            @PathVariable Long id,
+            @Valid @RequestBody UpdateLocationRequest request) {
+
+        return ResponseEntity.ok(
+                service.updateLocation(id, request)
+        );
+    }
+
+    @PreAuthorize(
+            "hasAnyRole('ADMIN','MANAGER') or hasAuthority('LOCATION_UPDATE')"
+    )
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteLocation(
+            @PathVariable Long id) {
+
+        service.deleteLocation(id);
+
+        return ResponseEntity.ok(
+                Map.of(
+                        "message",
+                        "Location deactivated successfully"
+                )
+        );
+    }
 }

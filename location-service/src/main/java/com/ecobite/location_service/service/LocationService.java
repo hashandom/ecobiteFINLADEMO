@@ -22,4 +22,11 @@ public interface LocationService {
     Long getWarehouseCount();
 
     LocationResponse getLocationById(Long id);
+
+    LocationResponse updateLocation(
+            Long id,
+            UpdateLocationRequest request
+    );
+
+    void deleteLocation(Long id);
 }

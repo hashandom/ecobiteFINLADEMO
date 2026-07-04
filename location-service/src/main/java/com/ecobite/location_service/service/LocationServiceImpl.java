@@ -66,9 +66,10 @@ public class LocationServiceImpl implements LocationService {
     @Override
     @Transactional
     public void assignBatch(AssignBatchRequest request) {
-        BatchLocation location = locationRepo.findById(request.getLocationId())
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Location not found"));
+        BatchLocation location = locationRepo.findByIdAndIsActiveTrue(
+                request.getLocationId()
+        ).orElseThrow(() ->
+                new ResourceNotFoundException("Location not found"));
 
         BatchResponse batch;
 
@@ -156,14 +157,16 @@ public class LocationServiceImpl implements LocationService {
     public void moveBatch(MoveBatchRequest request) {
 
         // Validate source location
-        BatchLocation from = locationRepo.findById(request.getFromLocationId())
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("From location not found"));
+        BatchLocation from = locationRepo.findByIdAndIsActiveTrue(
+                request.getFromLocationId()
+        ).orElseThrow(() ->
+                new ResourceNotFoundException("From location not found"));
 
         // Validate destination location
-        BatchLocation to = locationRepo.findById(request.getToLocationId())
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("To location not found"));
+        BatchLocation to = locationRepo.findByIdAndIsActiveTrue(
+                request.getToLocationId()
+        ).orElseThrow(() ->
+                new ResourceNotFoundException("To location not found"));
         if (request.getQuantity() <= 0) {
 
             throw new BadRequestException(
@@ -284,7 +287,7 @@ public class LocationServiceImpl implements LocationService {
 
     @Override
     public List<LocationResponse> getAllLocations() {
-        return locationRepo.findAll()
+        return locationRepo.findByIsActiveTrue()
                 .stream()
                 .map(this::mapToResponse)
                 .toList();
@@ -317,7 +320,7 @@ public class LocationServiceImpl implements LocationService {
     public LocationResponse getLocationById(Long id) {
 
         BatchLocation location =
-                locationRepo.findById(id)
+                locationRepo.findByIdAndIsActiveTrue(id)
                         .orElseThrow(() ->
                                 new ResourceNotFoundException(
                                         "Location not found"
@@ -415,5 +418,86 @@ public class LocationServiceImpl implements LocationService {
                     "Cannot " + operation + " spoiled batch"
             );
         }
+    }
+
+    @Override
+    @Transactional
+    public LocationResponse updateLocation(
+            Long id,
+            UpdateLocationRequest request
+    ) {
+
+        BatchLocation location = locationRepo.findByIdAndIsActiveTrue(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Location not found"
+                        ));
+
+        // Cannot reduce capacity below current occupancy
+        if (request.getCapacity() <
+                location.getCurrentOccupancy()) {
+
+            throw new BadRequestException(
+                    "Capacity cannot be less than current occupancy"
+            );
+        }
+
+        String newLocationCode =
+                request.getWarehouse().trim().toUpperCase()
+                        + "-"
+                        + request.getSection().trim().toUpperCase()
+                        + "-"
+                        + request.getShelf().trim().toUpperCase();
+
+        if (!newLocationCode.equals(location.getLocationCode())
+                && locationRepo.existsByLocationCode(
+                newLocationCode)) {
+
+            throw new BadRequestException(
+                    "Location already exists"
+            );
+        }
+
+        location.setWarehouse(
+                request.getWarehouse().trim().toUpperCase()
+        );
+
+        location.setSection(
+                request.getSection().trim().toUpperCase()
+        );
+
+        location.setShelf(
+                request.getShelf().trim().toUpperCase()
+        );
+
+        location.setCapacity(request.getCapacity());
+        location.setLocationCode(newLocationCode);
+
+        locationRepo.save(location);
+
+        return mapToResponse(location);
+    }
+
+    @Override
+    @Transactional
+    public void deleteLocation(Long id) {
+
+        BatchLocation location = locationRepo.findByIdAndIsActiveTrue(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Location not found"
+                        ));
+
+        // Prevent deleting locations with inventory
+        if (location.getCurrentOccupancy() > 0) {
+
+            throw new BadRequestException(
+                    "Cannot delete location with inventory"
+            );
+        }
+
+        location.setIsActive(false);
+
+        locationRepo.save(location);
     }
 }

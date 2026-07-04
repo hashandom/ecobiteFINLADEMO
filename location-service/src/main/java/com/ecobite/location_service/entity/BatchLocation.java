@@ -27,7 +27,10 @@ public class BatchLocation {
     private Integer capacity;
     private Integer currentOccupancy;
 
+    @Column(nullable = false)
+    @Builder.Default
     private Boolean isActive = true;
 
     private LocalDateTime createdAt;
+
 }

@@ -20,6 +20,8 @@ public class Batch {
 
     @Column(unique = true)
     private String batchNumber;
+    @Column(nullable = false)
+    private String productName;
 
     private String productId;
 

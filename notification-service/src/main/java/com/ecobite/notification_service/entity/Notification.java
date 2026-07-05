@@ -25,5 +25,6 @@ public class Notification {
     private String type; // EMAIL / SYSTEM
     private String status; // SENT / PENDING
     private LocalDateTime createdAt;
-    private Boolean isRead;
+    private Boolean isRead =false;
+    private String targetRole;
 }

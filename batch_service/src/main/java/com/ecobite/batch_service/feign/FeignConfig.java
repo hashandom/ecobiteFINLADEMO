@@ -17,6 +17,11 @@ public class FeignConfig {
             ServletRequestAttributes attributes =
                     (ServletRequestAttributes)
                             RequestContextHolder.getRequestAttributes();
+            if (attributes == null) {
+                System.out.println(
+                        "NO REQUEST CONTEXT AVAILABLE"
+                );
+            }
 
             if (attributes != null) {
 

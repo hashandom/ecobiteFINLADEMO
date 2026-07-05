@@ -24,11 +24,11 @@ public class NotificationController {
         return repository.findAll();
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN','MANAGER','STAFF')")
-    @GetMapping("/unread/count")
-    public Long getUnreadCount() {
-        return repository.countByIsReadFalse();
-    }
+//    @PreAuthorize("hasAnyRole('ADMIN','MANAGER','STAFF')")
+//    @GetMapping("/unread/count")
+//    public Long getUnreadCount() {
+//        return repository.countByIsReadFalse();
+//    }
 
     @PreAuthorize("hasAnyRole('ADMIN','MANAGER','STAFF')")
     @GetMapping("/count")

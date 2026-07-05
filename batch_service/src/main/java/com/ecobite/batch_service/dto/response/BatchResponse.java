@@ -31,4 +31,6 @@ public class BatchResponse {
     private BigDecimal purchasePrice;
 
     private String status;
+
+    private String productName;
 }

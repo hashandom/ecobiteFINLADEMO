@@ -23,7 +23,7 @@ public class BatchExpiryAlertScheduler {
     private final ProductClient productClient;
 
     //@Scheduled(cron = "0 0 8 * * ?") // every day at 8 AM
-    @Scheduled(fixedRate = 10000) // every day at 8 AM
+    @Scheduled(fixedRate = 10000) // Run every 10 seconds FOR TESTING
     public void checkExpiringBatches() {
 
         LocalDate today = LocalDate.now();
@@ -36,15 +36,18 @@ public class BatchExpiryAlertScheduler {
                                 next7Days,
                                 "ACTIVE"
                         );
+        System.out.println(
+                "Expiring batches found: "
+                        + expiringBatches.size()
+        );
 
         for (Batch batch : expiringBatches) {
-            ProductResponse product =
-                    productClient.getProduct(batch.getProductId());
+
 
 
             BatchEvent event = new BatchEvent(
                     "BATCH_EXPIRING",
-                    product.getName(),
+                    batch.getProductName(),
                     batch.getId(),
                     batch.getExpiryDate(),
                     batch.getRemainingQuantity()

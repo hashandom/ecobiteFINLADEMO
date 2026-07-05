@@ -18,10 +18,10 @@ public class ExpiredBatchScheduler {
     private final BatchRepository batchRepository;
 
     //Runs every 10 seconds (FOR TESTING)
-    //@Scheduled(fixedRate = 10000)
+    @Scheduled(fixedRate = 10000)
 
     // Production scheduler (daily midnight)
-    @Scheduled(cron = "0 0 0 * * ?")
+    //@Scheduled(cron = "0 0 0 * * ?")
     public void markExpiredBatches() {
         log.info("Checking expired batches...");
         List<Batch> expiredBatches =

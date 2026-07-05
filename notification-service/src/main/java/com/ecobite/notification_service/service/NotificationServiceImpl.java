@@ -20,15 +20,49 @@ public class NotificationServiceImpl implements NotificationService {
     @Override
     public void handleBatchEvent(BatchEvent event) {
         if ("BATCH_EXPIRING".equals(event.getEventType())) {
-            String message = "Batch " + event.getBatchId() +
-                    " of " + event.getProductName() +
-                    " expires on " + event.getExpiryDate();
-            saveNotification(message, "EXPIRY_ALERT");
+
+            String message =
+                    "Batch " + event.getBatchId() +
+                            " of " + event.getProductName() +
+                            " expires on " + event.getExpiryDate();
+
+            saveNotification(
+                    message,
+                    "EXPIRY_ALERT",
+                    "MANAGER"
+            );
         }
+
         else if ("BATCH_CREATED".equals(event.getEventType())) {
-            String message = "New batch created: " + event.getBatchId() +
-                    " for " + event.getProductName();
-            saveNotification(message, "BATCH_CREATED");
+
+            String message =
+                    "New batch created: "
+                            + event.getBatchId()
+                            + " for "
+                            + event.getProductName();
+
+            saveNotification(
+                    message,
+                    "BATCH_CREATED",
+                    "ADMIN"
+            );
+        }
+
+        else if ("STOCK_REDUCED".equals(event.getEventType())) {
+
+            String message =
+                    "Stock reduced for batch "
+                            + event.getBatchId()
+                            + " of "
+                            + event.getProductName()
+                            + ". Remaining quantity: "
+                            + event.getRemainingQuantity();
+
+            saveNotification(
+                    message,
+                    "REORDER_REQUIRED",
+                    "ADMIN"
+            );
         }
     }
 
@@ -42,7 +76,8 @@ public class NotificationServiceImpl implements NotificationService {
                         " New product created: "
                                 + event.getProductName();
 
-                saveNotification(createdMessage, "PRODUCT_CREATED");
+                saveNotification(createdMessage, "PRODUCT_CREATED",
+                        "ADMIN");
 
                 break;
 
@@ -57,7 +92,8 @@ public class NotificationServiceImpl implements NotificationService {
                                 + event.getReorderLevel()
                                 + ")";
 
-                saveNotification(lowStockMessage, "STOCK_ALERT");
+                saveNotification(lowStockMessage, "STOCK_ALERT",
+                        "MANAGER");
 
                 break;
 
@@ -72,17 +108,24 @@ public class NotificationServiceImpl implements NotificationService {
     @Override
     public void handleSupplierEvent(SupplierEvent event) {
         String message = "New Supplier Added: " + event.getSupplierName();
-        saveNotification(message, "SUPPLIER");
+        saveNotification(message,  "SUPPLIER_CREATED",
+                "ADMIN");
     }
 
-    private void saveNotification(String message, String type) {
+    private void saveNotification(String message, String type, String targetRole) {
+
+
         Notification notification = Notification.builder()
                 .message(message)
                 .type(type)
+                .targetRole(targetRole)
                 .status("SENT")
+                .isRead(false)
                 .createdAt(LocalDateTime.now())
                 .build();
+
         notificationRepository.save(notification);
+
         System.out.println("Notification Saved: " + message);
     }
 

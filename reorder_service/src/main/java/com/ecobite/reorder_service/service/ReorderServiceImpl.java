@@ -116,9 +116,11 @@ public class ReorderServiceImpl implements ReorderService {
         // SEND EVENT
         ReorderEvent event = new ReorderEvent(
                 product.getId(),
+                product.getName(),
                 supplier.getId(),
+                supplier.getName(),
                 request.getQuantity(),
-                "Reorder created for product " + product.getId()
+                "Reorder created"
         );
 
         reorderProducer.sendEvent(event);

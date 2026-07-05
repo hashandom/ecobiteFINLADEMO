@@ -2,6 +2,7 @@ package com.ecobite.notification_service.service;
 
 import com.ecobite.notification_service.dto.event.BatchEvent;
 import com.ecobite.notification_service.dto.event.ProductEvent;
+import com.ecobite.notification_service.dto.event.ReorderEvent;
 import com.ecobite.notification_service.dto.event.SupplierEvent;
 import com.ecobite.notification_service.entity.Notification;
 import com.ecobite.notification_service.repository.NotificationRepository;
@@ -112,6 +113,22 @@ public class NotificationServiceImpl implements NotificationService {
                 "ADMIN");
     }
 
+    public void handleReorderEvent(ReorderEvent event) {
+
+        String message =
+                "Reorder created for "
+                        + event.getProductName()
+                        + ". Best supplier selected: "
+                        + event.getSupplierName()
+                        + ". Quantity: "
+                        + event.getQuantity();
+
+        saveNotification(
+                message,
+                "REORDER_CREATED",
+                "ADMIN"
+        );
+    }
     private void saveNotification(String message, String type, String targetRole) {
 
 
@@ -130,4 +147,54 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
 
+    @Override
+    public List<Notification>
+    getNotificationsByRole(String role) {
+
+        return notificationRepository
+                .findByTargetRoleOrderByCreatedAtDesc(
+                        role
+                );
+    }
+
+
+    @Override
+    public Long getUnreadCount(
+            String role) {
+
+        return notificationRepository
+                .countByTargetRoleAndIsReadFalse(
+                        role
+                );
+    }
+
+
+    @Override
+    public Long getTotalCount(
+            String role) {
+
+        return notificationRepository
+                .countByTargetRole(
+                        role
+                );
+    }
+
+
+    @Override
+    public void markAsRead(Long id) {
+
+        Notification notification =
+                notificationRepository.findById(id)
+                        .orElseThrow(
+                                () -> new RuntimeException(
+                                        "Notification not found"
+                                )
+                        );
+
+        notification.setIsRead(true);
+
+        notificationRepository.save(
+                notification
+        );
+    }
 }

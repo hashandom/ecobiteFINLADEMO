@@ -9,7 +9,14 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ReorderEvent {
     private String productId;
+
+    private String productName;
+
     private Long supplierId;
-    private int quantity;
+
+    private String supplierName;
+
+    private Integer quantity;
+
     private String message;
 }

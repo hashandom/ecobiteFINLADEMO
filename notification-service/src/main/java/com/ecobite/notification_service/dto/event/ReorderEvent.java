@@ -10,4 +10,7 @@ public class ReorderEvent {
     private String status;
     private String message;
     private long timestamp;
+    private String productName;
+    private String supplierName;
+
 }

@@ -11,4 +11,9 @@ public interface SupplierClient {
     SupplierResponse getBestSupplier(
             @PathVariable("productId") String productId
     );
+
+    @GetMapping("/suppliers/{id}")
+    SupplierResponse getSupplier(
+            @PathVariable Long id
+    );
 }

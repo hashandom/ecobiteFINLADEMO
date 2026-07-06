@@ -12,4 +12,9 @@ public interface BatchClient {
     @GetMapping("/batches/product/{productId}")
     List<BatchResponse> getBatchByProductId(@PathVariable("productId") String productId);
 
+    @GetMapping("/batches/supplier/{productId}")
+    BatchResponse getSupplierForProduct(
+            @PathVariable String productId
+    );
+
 }

@@ -143,4 +143,16 @@ public class BatchController {
                 service.recallBatch(id)
         );
     }
+
+    @GetMapping("/supplier/{productId}")
+    public ResponseEntity<BatchResponse>
+    getSupplierForProduct(
+            @PathVariable String productId
+    ){
+        return ResponseEntity.ok(
+                service.getPreferredSupplier(
+                        productId
+                )
+        );
+    }
 }

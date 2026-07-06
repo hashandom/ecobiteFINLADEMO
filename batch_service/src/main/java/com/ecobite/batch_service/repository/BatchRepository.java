@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 public interface BatchRepository extends JpaRepository<Batch, Long> {
     //Get all batches for a product
@@ -45,6 +46,13 @@ public interface BatchRepository extends JpaRepository<Batch, Long> {
     findByExpiryDateBetweenAndStatusAndExpiryAlertSentFalse(
             LocalDate start,
             LocalDate end,
+            String status
+    );
+
+
+    //latest active batch for a product
+    Optional<Batch> findFirstByProductIdAndStatusOrderByExpiryDateDesc(
+            String productId,
             String status
     );
 }

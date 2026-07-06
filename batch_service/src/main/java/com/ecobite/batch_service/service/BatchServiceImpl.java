@@ -460,5 +460,22 @@ public class BatchServiceImpl implements BatchService {
         return allocations;
     }
 
+    public BatchResponse getPreferredSupplier(
+            String productId
+    ){
+        Batch batch =
+                repository
+                        .findFirstByProductIdAndStatusOrderByExpiryDateDesc(
+                                productId,
+                                "ACTIVE"
+                        )
+                        .orElseThrow(
+                                () -> new RuntimeException(
+                                        "No supplier found"
+                                )
+                        );
+
+        return mapToResponse(batch);
+    }
 
 }

@@ -29,4 +29,7 @@ public interface BatchService {
     Long getExpiringSoonCount();
 
     List<BatchResponse> getAllBatches();
+
+    BatchResponse getPreferredSupplier(String productId);
+
 }

@@ -15,4 +15,7 @@ public interface  ProductClient {
 
     @GetMapping("/products")
     List<ProductResponse> getAllProducts();
+
+    @GetMapping("/products/low-stock")
+    List<ProductResponse> getLowStockProducts();
 }

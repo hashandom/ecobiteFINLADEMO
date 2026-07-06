@@ -2,9 +2,7 @@ package com.ecobite.reorder_service.service;
 
 import com.ecobite.reorder_service.DTOs.event.ReorderEvent;
 import com.ecobite.reorder_service.DTOs.request.ReorderRequest;
-import com.ecobite.reorder_service.DTOs.response.ProductResponse;
-import com.ecobite.reorder_service.DTOs.response.ReorderResponse;
-import com.ecobite.reorder_service.DTOs.response.SupplierResponse;
+import com.ecobite.reorder_service.DTOs.response.*;
 import com.ecobite.reorder_service.entity.Reorder;
 import com.ecobite.reorder_service.exception.BadRequestException;
 import com.ecobite.reorder_service.exception.ResourceNotFoundException;
@@ -17,6 +15,8 @@ import feign.FeignException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class ReorderServiceImpl implements ReorderService {
@@ -139,5 +139,60 @@ public class ReorderServiceImpl implements ReorderService {
     @Override
     public Long getPendingReordersCount() {
         return repository.countByStatus("CREATED");
+    }
+
+
+    public List<LowStockSupplierResponse>
+    getLowStockWithSuppliers(){
+
+        List<ProductResponse> lowStockProducts =
+                productClient.getLowStockProducts();
+
+        List<LowStockSupplierResponse> result =
+                new ArrayList<>();
+
+        for(ProductResponse product : lowStockProducts){
+
+            BatchResponse batch =
+                    batchClient.getSupplierForProduct(
+                            product.getId()
+                    );
+
+            SupplierResponse supplier =
+                    supplierClient.getSupplier(
+                            batch.getSupplierId()
+                    );
+
+            result.add(
+                    LowStockSupplierResponse.builder()
+                            .productId(
+                                    product.getId()
+                            )
+                            .productName(
+                                    product.getName()
+                            )
+                            .currentStock(
+                                    product.getStock()
+                            )
+                            .reorderLevel(
+                                    product.getReorderLevel()
+                            )
+                            .supplierId(
+                                    supplier.getId()
+                            )
+                            .supplierName(
+                                    supplier.getName()
+                            )
+                            .supplierEmail(
+                                    supplier.getEmail()
+                            )
+                            .supplierPhone(
+                                    supplier.getPhone()
+                            )
+                            .build()
+            );
+        }
+
+        return result;
     }
 }

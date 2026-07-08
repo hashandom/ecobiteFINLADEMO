@@ -4,7 +4,6 @@ import com.ecobite.notification_service.entity.Notification;
 import com.ecobite.notification_service.repository.NotificationRepository;
 import com.ecobite.notification_service.service.NotificationService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 
@@ -73,4 +72,12 @@ public class NotificationController {
 
         return "Notification marked as read";
     }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/unread/count")
+    public Long getUnreadCount() {
+        return repository.countByIsReadFalse();
+    }
+
+
 }

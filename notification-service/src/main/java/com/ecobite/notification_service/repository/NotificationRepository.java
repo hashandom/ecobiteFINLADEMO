@@ -15,4 +15,6 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
     findByTargetRoleAndIsReadFalseOrderByCreatedAtDesc(
             String role
     );
+
+    Long countByIsReadFalse();
 }

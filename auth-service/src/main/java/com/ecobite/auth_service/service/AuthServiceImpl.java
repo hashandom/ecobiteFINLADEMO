@@ -10,16 +10,19 @@ import com.ecobite.auth_service.repository.BlackListedTokenRepository;
 import com.ecobite.auth_service.repository.UserRepository;
 import com.ecobite.auth_service.security.JwtService;
 import jakarta.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
 @Service
 public class AuthServiceImpl implements AuthService{
+    @Value("${app.frontend-url}")
+    private String frontendUrl;
+
     @Autowired
     private UserRepository repository;
 
@@ -31,6 +34,10 @@ public class AuthServiceImpl implements AuthService{
 
     @Autowired
     private BlackListedTokenRepository blackListedTokenRepository;
+
+    @Autowired
+    private EmailService emailService;
+
     @Override
     public RegisterResponse register(RegisterRequest request) {
 
@@ -163,10 +170,24 @@ public class AuthServiceImpl implements AuthService{
         User user = repository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new RuntimeException("Email not found"));
         String token = UUID.randomUUID().toString();
+
         user.setResetToken(token);
-        user.setTokenExpiry(LocalDateTime.now().plusMinutes(15));
+
+        user.setTokenExpiry(
+                LocalDateTime.now().plusMinutes(15)
+        );
+
         repository.save(user);
-        return "Password reset token: " + token;
+
+        String resetLink =
+                frontendUrl + "/reset-password?token=" + token;
+
+        emailService.sendResetEmail(
+                user.getEmail(),
+                resetLink
+        );
+
+        return "Password reset email sent.";
     }
 
     @Override

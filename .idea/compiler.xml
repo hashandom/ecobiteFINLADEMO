@@ -9,6 +9,7 @@
         <outputRelativeToContentRoot value="true" />
         <module name="batch_service" />
         <module name="config-server" />
+        <module name="auth-service" />
         <module name="discovery-server" />
         <module name="dashboard-service" />
         <module name="location-service" />
@@ -35,7 +36,6 @@
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.44/lombok-1.18.44.jar" />
         </processorPath>
         <module name="reorder_service" />
-        <module name="auth-service" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>

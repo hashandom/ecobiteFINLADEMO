@@ -2,6 +2,7 @@ package com.ecobite.batch_service.service;
 
 import com.ecobite.batch_service.dto.request.CreateBatchRequest;
 import com.ecobite.batch_service.dto.request.ReduceStockRequest;
+import com.ecobite.batch_service.dto.response.AvaliableStockResponse;
 import com.ecobite.batch_service.dto.response.BatchResponse;
 
 import java.util.List;
@@ -31,5 +32,7 @@ public interface BatchService {
     List<BatchResponse> getAllBatches();
 
     BatchResponse getPreferredSupplier(String productId);
+
+    AvaliableStockResponse getAvailableStock(String productId);
 
 }

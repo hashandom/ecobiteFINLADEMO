@@ -4,6 +4,7 @@ package com.ecobite.batch_service.controller;
 import com.ecobite.batch_service.dto.request.AllocateBatchRequest;
 import com.ecobite.batch_service.dto.request.CreateBatchRequest;
 import com.ecobite.batch_service.dto.request.ReduceStockRequest;
+import com.ecobite.batch_service.dto.response.AvaliableStockResponse;
 import com.ecobite.batch_service.dto.response.BatchAllocationResponse;
 import com.ecobite.batch_service.dto.response.BatchResponse;
 import com.ecobite.batch_service.service.BatchServiceImpl;
@@ -153,6 +154,15 @@ public class BatchController {
                 service.getPreferredSupplier(
                         productId
                 )
+        );
+    }
+
+    @GetMapping("/product/{productId}/available-stock")
+    public ResponseEntity<AvaliableStockResponse> getAvailableStock(
+            @PathVariable String productId) {
+
+        return ResponseEntity.ok(
+                service.getAvailableStock(productId)
         );
     }
 }

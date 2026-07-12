@@ -307,7 +307,25 @@ public class LocationServiceImpl implements LocationService {
 
         return inventoryRepo.findByBatchId(batchId)
                 .stream()
-                .map(this::mapToInventoryResponse)
+                .map(inventory -> {
+
+                    BatchLocation location = locationRepo.findById(
+                                    inventory.getLocationId())
+                            .orElseThrow(() ->
+                                    new ResourceNotFoundException("Location not found"));
+
+                    InventoryLocationResponse response = new InventoryLocationResponse();
+
+                    response.setBatchId(inventory.getBatchId());
+                    response.setLocationId(location.getId());
+                    response.setLocationCode(location.getLocationCode());
+                    response.setWarehouse(location.getWarehouse());
+                    response.setSection(location.getSection());
+                    response.setShelf(location.getShelf());
+                    response.setQuantity(inventory.getQuantity());
+
+                    return response;
+                })
                 .toList();
     }
 

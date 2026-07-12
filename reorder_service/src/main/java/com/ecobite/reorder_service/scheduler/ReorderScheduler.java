@@ -21,7 +21,7 @@ public class ReorderScheduler {
     }
 
     //Runs every 5 minutes
-    @Scheduled(fixedRate = 300000)
+    @Scheduled(fixedRate = 10000)
     public void autoReorderCheck() {
 
         System.out.println("Running auto reorder check...");

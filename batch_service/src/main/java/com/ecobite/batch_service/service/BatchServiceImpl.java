@@ -7,6 +7,7 @@ import com.ecobite.batch_service.dto.Kafkaevent.BatchEvent;
 import com.ecobite.batch_service.dto.request.AllocateBatchRequest;
 import com.ecobite.batch_service.dto.request.CreateBatchRequest;
 import com.ecobite.batch_service.dto.request.ReduceStockRequest;
+import com.ecobite.batch_service.dto.response.AvaliableStockResponse;
 import com.ecobite.batch_service.dto.response.BatchAllocationResponse;
 import com.ecobite.batch_service.dto.response.BatchResponse;
 import com.ecobite.batch_service.dto.response.ProductResponse;
@@ -476,6 +477,26 @@ public class BatchServiceImpl implements BatchService {
                         );
 
         return mapToResponse(batch);
+    }
+
+    @Override
+    public AvaliableStockResponse getAvailableStock(String productId) {
+
+        List<Batch> batches =
+                repository.findByProductIdAndStatus(
+                        productId,
+                        "ACTIVE"
+                );
+
+        int availableStock =
+                batches.stream()
+                        .mapToInt(Batch::getRemainingQuantity)
+                        .sum();
+
+        return AvaliableStockResponse.builder()
+                .productId(productId)
+                .availableStock(availableStock)
+                .build();
     }
 
 }
